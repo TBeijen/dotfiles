@@ -15,7 +15,30 @@ PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 export PATH="/usr/local/opt/openssl/bin:$PATH"
 
 # Configure prompt
-PS1="[\W:]$ "
+function make_prompt {
+
+    EXITSTATUS="$?"
+    BOLD="\[\033[1m\]"
+    RED="\[\033[1;31m\]"
+    GREEN="\[\e[32;1m\]"
+    BLUE="\[\e[34;1m\]"
+    OFF="\[\033[m\]"
+
+    if [ "${EXITSTATUS}" -eq 0 ]
+    then
+    	PROMPTCOLOR=${GREEN}
+    else
+    	PROMPTCOLOR=${RED}
+    fi
+
+    GITBRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/')
+
+    PS1="[\W${BLUE}${GITBRANCH}${OFF}:]${BOLD}${PROMPTCOLOR}\$${OFF} "
+    PS2="${BOLD}>${OFF} "
+}
+
+PROMPT_COMMAND=make_prompt
+# PS1="[\W:]$ "
 
 # locale (needed for sphynx)
 export LC_ALL=en_US.UTF-8
