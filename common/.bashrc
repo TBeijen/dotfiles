@@ -24,6 +24,7 @@ function make_prompt {
     BLUE="\[\e[34;1m\]"
     OFF="\[\033[m\]"
 
+    # exit status
     if [ "${EXITSTATUS}" -eq 0 ]
     then
     	PROMPTCOLOR=${GREEN}
@@ -31,9 +32,16 @@ function make_prompt {
     	PROMPTCOLOR=${RED}
     fi
 
+    # python virtualenv
+    if test -z "$VIRTUAL_ENV" ; then
+	  PYTHONVENV=""
+    else
+      PYTHONVENV="${BOLD}(`basename \"$VIRTUAL_ENV\"`)${OFF} "
+    fi
+    # git
     GITBRANCH=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/')
 
-    PS1="[\W${BLUE}${GITBRANCH}${OFF}:]${BOLD}${PROMPTCOLOR}\$${OFF} "
+    PS1="[${PYTHONVENV}\W${BLUE}${GITBRANCH}${OFF}:]${BOLD}${PROMPTCOLOR}\$${OFF} "
     PS2="${BOLD}>${OFF} "
 }
 
