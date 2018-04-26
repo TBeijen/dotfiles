@@ -17,6 +17,9 @@ export PATH="/usr/local/opt/openssl/bin:$PATH"
 # Configure prompt
 source ~/dotfiles/common/prompt.sh
 
+# Kube config, allowing multiple config files
+export KUBECONFIG="$(find ~/.kube -type f -name 'config*'  | tr '\n' ':')"
+
 # locale (needed for sphynx)
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
