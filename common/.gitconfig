@@ -1,0 +1,16 @@
+# .gitconfig to be included from host-specific .gitconfig
+# 
+# Append to ~/.gitconfig:
+#
+# [include]
+#   path = dotfiles/common/.gitconfig
+#
+[push]
+	default = matching
+[merge]
+	ff = false
+[pull]
+	ff = only
+[alias]
+    lot = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(yellow)%h%C(reset) %C(green)(%ar)%C(reset) - %C(cyan)%an%C(reset) - %C(white)%aD%C(reset) -%C(bold red)%d%C(reset) %C(dim white)%s%C(reset)' --all
+	hist = log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short
