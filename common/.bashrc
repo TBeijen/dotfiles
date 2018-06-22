@@ -17,8 +17,10 @@ export PATH="/usr/local/opt/openssl/bin:$PATH"
 # Configure prompt
 source ~/dotfiles/common/prompt.sh
 
-# Kube config, allowing multiple config files
-export KUBECONFIG="$(find ~/.kube -type f -name 'config*'  | tr '\n' ':')"
+# Kube config, allowing multiple config files. Initially load all configs.
+# Explicitly loading default.config first, using it to specify the default context
+# which is the first current-context encountered (See: https://coreos.com/blog/kubectl-tips-and-tricks)
+export KUBECONFIG="~/.kube/default.config:$(find ~/.kube -type f -name '*.config'  | tr '\n' ':')"
 
 # locale (needed for sphynx)
 export LC_ALL=en_US.UTF-8
@@ -44,6 +46,7 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
 source ~/dotfiles/common/aws_scripts.sh
+source ~/dotfiles/common/scripts.sh
 
 # --------------------------------------------------------------------------- #
 # History
