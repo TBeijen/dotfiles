@@ -20,6 +20,14 @@ aws_ip() {
   aws --output text ec2 describe-instances --instance-id $INSTANCE_ID --query 'Reservations[].Instances[].PrivateIpAddress'
 }
 
+# List auto scaling groups
+#
+# Usage:
+#   aws_asg_list
+aws_asg_list() {
+  aws autoscaling describe-auto-scaling-groups | jq -r .AutoScalingGroups[].AutoScalingGroupName
+}
+
 # List instances of auto scaling group.
 # Optionally sets desired capacity.
 #
