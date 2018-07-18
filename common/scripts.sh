@@ -18,5 +18,5 @@ set_workspace() {
   export AWS_SDK_LOAD_CONFIG=1
   export AWS_PROFILE=${ACCOUNT}
   export KUBECONFIG=$HOME/.kube/${ACCOUNT}.config
-  kubectl config use-context ${CONTEXT}.k8s.cloud.sanoma.com
+  kubectl config use-context ${CONTEXT}
 }
