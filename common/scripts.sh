@@ -8,10 +8,15 @@
 # Assumes Kubernetes contexts to be in separate configuration files, reducing risk of activating unexpected context.
 set_workspace() {
   ACCOUNT=$1
+  ROLE=$2
+  CONTEXT=$ACCOUNT
+  if [[ $ROLE ]]; then
+  	CONTEXT=$ACCOUNT-$ROLE
+  fi
   export KOPS_STATE_STORE=s3://${ACCOUNT}-kops-state
   export CLUSTER_NAME=${ACCOUNT}.k8s.cloud.sanoma.com
   export AWS_SDK_LOAD_CONFIG=1
   export AWS_PROFILE=${ACCOUNT}
   export KUBECONFIG=$HOME/.kube/${ACCOUNT}.config
-  kubectl config use-context ${ACCOUNT}.k8s.cloud.sanoma.com
+  kubectl config use-context ${CONTEXT}.k8s.cloud.sanoma.com
 }
