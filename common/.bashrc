@@ -45,9 +45,9 @@ export PYENV_ROOT="/Users/tibobeijen/.pyenv"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
+source ~/dotfiles/common/scripts.sh
 source ~/dotfiles/common/aws_scripts.sh
 source ~/dotfiles/common/kube_scripts.sh
-source ~/dotfiles/common/scripts.sh
 
 # --------------------------------------------------------------------------- #
 # History
