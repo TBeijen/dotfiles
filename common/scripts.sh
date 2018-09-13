@@ -45,10 +45,14 @@ HELP
   fi
   # Kops
   export KOPS_STATE_STORE=s3://${ACCOUNT}-kops-state
-  export CLUSTER_NAME=${ACCOUNT}.k8s.cloud.sanoma.com
+  export KOPS_CLUSTER_NAME=${ACCOUNT}.k8s.cloud.sanoma.com
   # AWS
   export AWS_SDK_LOAD_CONFIG=1
   export AWS_PROFILE=${AWSPROF}
+
+  # @TODO expand to symlink per account name to be able to differentiate test/prod kops versions
+  alias kops='/usr/local/bin/kops-1.9.1'
+
   # Kube
   KUBECONFIG=$HOME/.kube/${ACCOUNT}.config
   if [ -f $KUBECONFIG ]; then
