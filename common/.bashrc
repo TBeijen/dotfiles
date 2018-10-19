@@ -22,6 +22,9 @@ source ~/dotfiles/common/prompt.sh
 # which is the first current-context encountered (See: https://coreos.com/blog/kubectl-tips-and-tricks)
 export KUBECONFIG="~/.kube/default.config:$(find ~/.kube -type f -name '*.config'  | tr '\n' ':')"
 
+# Running Helm Tiller component local by default
+export HELM_HOST=localhost:44134
+
 # locale (needed for sphynx)
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
