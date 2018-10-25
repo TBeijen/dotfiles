@@ -51,7 +51,7 @@ HELP
   export AWS_PROFILE=${AWSPROF}
 
   # @TODO expand to symlink per account name to be able to differentiate test/prod kops versions
-  alias kops='/usr/local/bin/kops-1.9.1'
+  alias kops='/usr/local/bin/kops-1.10.0'
 
   # Kube
   KUBECONFIG=$HOME/.kube/${ACCOUNT}.config
