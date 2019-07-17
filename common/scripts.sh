@@ -51,7 +51,7 @@ HELP
   export AWS_PROFILE=${AWSPROF}
 
   # @TODO define binary per per account name to be able to differentiate test/prod kops versions
-  export KOPS_BINARY='/usr/local/bin/kops-1.10.0'
+  export KOPS_BINARY='/usr/local/bin/kops-1.11.1'
 
   # Kube
   KUBECONFIG=$HOME/.kube/${ACCOUNT}.config
@@ -69,3 +69,4 @@ HELP
 kops() {
   $KOPS_BINARY "$@"
 }
+export -f kops

@@ -20,7 +20,7 @@ source ~/dotfiles/common/prompt.sh
 # Kube config, allowing multiple config files. Initially load all configs.
 # Explicitly loading default.config first, using it to specify the default context
 # which is the first current-context encountered (See: https://coreos.com/blog/kubectl-tips-and-tricks)
-export KUBECONFIG="~/.kube/default.config:$(find ~/.kube -type f -name '*.config'  | tr '\n' ':')"
+export KUBECONFIG="$HOME/.kube/default.config"
 
 # Running Helm Tiller component local by default
 export HELM_HOST=localhost:44134
@@ -44,7 +44,7 @@ SSH_HOSTS="$SSH_HOSTS_KNOWN $SSH_HOSTS_CONFIG"
 complete -o plusdirs -o filenames -W "$SSH_HOSTS" scp 
 complete -W "$SSH_HOSTS" ssh 
 
-export PYENV_ROOT="/Users/tibobeijen/.pyenv"
+export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
