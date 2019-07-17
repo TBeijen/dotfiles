@@ -20,6 +20,11 @@ _show_help() {
   fi
 }
 
+# Recursively clean all python cache files from current dir
+# @see https://stackoverflow.com/a/41386937
+pyclean () {
+    find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+}
 
 set_workspace() {
   _show_help "$(cat <<-HELP

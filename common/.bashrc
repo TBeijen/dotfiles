@@ -9,6 +9,7 @@
 export INPUTRC=~/.inputrc
 
 # add various directories to PATH
+PATH=/usr/local/opt/mysql@5.6/bin:$PATH
 PATH=~/bin:/usr/local/bin:/usr/local/sbin:$PATH
 PATH=/usr/local/terraform:$PATH
 PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
