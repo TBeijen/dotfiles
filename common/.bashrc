@@ -33,6 +33,11 @@ export LANG=en_US.UTF-8
 # Load RVM into a shell session *as a function*
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
+# Fixing SOPS-GPG integration
+# See: https://github.com/mozilla/sops/issues/304#issuecomment-377195341
+GPG_TTY=$(tty)
+export GPG_TTY
+
 # --------------------------------------------------------------------------- #
 # Aliases and auto completion
 # --------------------------------------------------------------------------- #
