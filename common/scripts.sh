@@ -14,7 +14,7 @@
 #   # ... function code
 # } 
 _show_help() {
-  if [[ "$3" == "-h" ]] || [[ "$2" == "1" && "$#" -lt 3 ]]; then
+  if [[ "$3" == "-h" ]] || [[ "$3" == "--help" ]] || [[ "$2" == "1" && "$#" -lt 3 ]]; then
     echo "$1"
     return 1
   fi
@@ -102,7 +102,7 @@ HELP
   export AWS_PROFILE=${AWSPROF}
 
   # @TODO define binary per per account name to be able to differentiate test/prod kops versions
-  export KOPS_BINARY='/usr/local/bin/kops-1.11.1'
+  export KOPS_BINARY='/usr/local/bin/kops-1.10.1'
 
   # Kube
   KUBECONFIG=$HOME/.kube/${ACCOUNT}.config

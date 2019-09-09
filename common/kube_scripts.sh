@@ -1,7 +1,12 @@
 # Copies kubernetes dashboard bearer token to clipboard
-kube_get_token() {
-  kubectl -n kube-system get secrets -o json|jq '.items[0].data.token'|tr -d '"'|base64 -D| pbcopy
-  echo "Token copied to clipboard"
+kube_get_admin_token() {
+  _show_help "$(cat <<-HELP
+Copies kube-system admin-user token to clipboard.
+HELP
+  )" 0 "$@" || return 0 
+
+  set -o pipefail
+  kubectl -n kube-system get secrets -o json|jq '.items[0].data.token'|tr -d '"'|base64 -D| pbcopy && echo "Token copied to clipboard"
 }
 
 
