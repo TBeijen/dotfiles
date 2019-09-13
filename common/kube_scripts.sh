@@ -18,7 +18,7 @@ Usage:
   kube_get_sa_token <namespace> <sa_name>
 
 HELP
-  )" 0 "$@" || return 0 
+  )" 1 "$@" || return 0 
 
   NAMESPACE=$1
   SA_NAME=$2
@@ -27,6 +27,30 @@ HELP
   kubectl -n $NAMESPACE get secrets $(kubectl -n $NAMESPACE get sa $SA_NAME -o json | jq -Mr '.secrets[].name') -o json | jq -Mr '.data.token' | base64 -D | pbcopy && echo "Token copied to clipboard"
 }
 
+
+kube_get_env_secret() {
+  _show_help "$(cat <<-HELP
+Echoes secret as env
+
+Usage:
+  kube_get_env_secret <namespace> <secret_name> <quote_values>
+
+Example:
+  kube_get_env_secret myapp env 1
+
+HELP
+  )" 1 "$@" || return 0 
+
+  NAMESPACE=$1
+  SECRET_NAME=$2
+
+  # boolean eval, commands are swapped, looks at exit code. See https://stackoverflow.com/a/3810777
+  if [[ $3 -eq "1" ]]; then
+    kubectl -n $NAMESPACE get secrets $SECRET_NAME -o json |jq -r '.data | map_values(@base64d) | to_entries | .[] | .key + "=\"" + .value +"\""'
+  else
+    kubectl -n $NAMESPACE get secrets $SECRET_NAME -o json |jq -r '.data | map_values(@base64d) | to_entries | .[] | .key + "=" + .value'
+  fi
+}
 
 
 kube_port_forward() {
