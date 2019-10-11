@@ -77,42 +77,48 @@ set_workspace() {
 Consistently switch configuration of: AWS, Kubernetes, Kops 
      
 Usage:
-  set_workspace <name> <role>     
+  set_workspace <aws-account> <role> <k8s-cluster (optional)> 
 
-Assumes AWS profile names, Kubernetes context names and Kops cluster name to follow consistent naming patterns.
+Assumes AWS profile names, Kubernetes context names and Kubernetes cluster name to follow consistent naming patterns.
 
 Assumes Kubernetes contexts to be in separate configuration files (based on name), reducing risk of activating unexpected context.
-The context searched for will be <name>-<role>.
+The context searched for will be either <aws-account>-<role> (default clusters) or <k8s-cluster>.
 HELP
   )" 1 "$@" || return 0
 
   ACCOUNT=$1
   ROLE=$2
-  CONTEXT=$ACCOUNT
-  AWSPROF=$ACCOUNT
-  if [[ $ROLE ]]; then
-  	CONTEXT=$ACCOUNT-$ROLE
+  CLUSTER=$3
+
+  # Determine AWS profile, Kube config file and context to use
+  if [[ $ACCOUNT == reset ]]; then
+    AWSPROF=default
+    KUBE_CONFIG_FILE=default.config 
+    KUBE_CONTEXT=minikube
+  else
     AWSPROF=$ACCOUNT-$ROLE
+    if [[ $CLUSTER ]]; then
+      KUBE_CONFIG_FILE=$ACCOUNT/$CLUSTER.config 
+      KUBE_CONTEXT=$CLUSTER
+    else
+      KUBE_CONFIG_FILE=$ACCOUNT/default.config
+      KUBE_CONTEXT=$ACCOUNT-$ROLE
+    fi
   fi
-  # Kops
-  export KOPS_STATE_STORE=s3://${ACCOUNT}-kops-state
-  export KOPS_CLUSTER_NAME=${ACCOUNT}.k8s.cloud.sanoma.com
-  # AWS
+
+  # Configure AWS & Kubernetes
   export AWS_SDK_LOAD_CONFIG=1
   export AWS_PROFILE=${AWSPROF}
+  KUBECONFIG=$HOME/.kube/${KUBE_CONFIG_FILE}
+  export KUBECONFIG=$KUBECONFIG
+  kubectl config use-context ${KUBE_CONTEXT}
 
-  # @TODO define binary per per account name to be able to differentiate test/prod kops versions
-  export KOPS_BINARY='/usr/local/bin/kops-1.10.1'
-
-  # Kube
-  KUBECONFIG=$HOME/.kube/${ACCOUNT}.config
-  if [ -f $KUBECONFIG ]; then
-    export KUBECONFIG=$KUBECONFIG
-    kubectl config use-context ${CONTEXT}
+  # Use correct KOPS version
+  if [[ -f $HOME/.kube/$ACCOUNT/kops ]]; then
+    # symlink found in account .kube folder
+    export KOPS_BINARY=$HOME/.kube/$ACCOUNT/kops
   else
-    # default = local minikube
-    export KUBECONFIG=$HOME/.kube/default.config
-    kubectl config use-context minikube
+    export KOPS_BINARY='/usr/local/bin/kops-1.10.1'
   fi
 }
 
