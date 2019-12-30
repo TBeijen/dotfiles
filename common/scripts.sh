@@ -77,12 +77,13 @@ set_workspace() {
 Consistently switch configuration of: AWS, Kubernetes, Kops 
      
 Usage:
-  set_workspace <aws-account> <role> <k8s-cluster (optional)> 
+  set_workspace <aws-account> <role> <k8s-cluster> 
+  set_workspace reset
 
 Assumes AWS profile names, Kubernetes context names and Kubernetes cluster name to follow consistent naming patterns.
 
 Assumes Kubernetes contexts to be in separate configuration files (based on name), reducing risk of activating unexpected context.
-The context searched for will be either <aws-account>-<role> (default clusters) or <k8s-cluster>.
+The context searched for will be <aws-account>-<role>.
 HELP
   )" 1 "$@" || return 0
 
@@ -93,25 +94,24 @@ HELP
   # Determine AWS profile, Kube config file and context to use
   if [[ $ACCOUNT == reset ]]; then
     AWSPROF=default
-    KUBE_CONFIG_FILE=default.config 
+    KUBE_CONFIG_FILE=$HOME/.kube/default.config 
     KUBE_CONTEXT=minikube
+
+    export AWS_SDK_LOAD_CONFIG=1
+    export KUBECONFIG=$KUBE_CONFIG_FILE
+    unset AWS_PROFILE    
+    # Not setting kube context. Leaving that to whatever is in default.config
   else
     AWSPROF=$ACCOUNT-$ROLE
-    if [[ $CLUSTER ]]; then
-      KUBE_CONFIG_FILE=$ACCOUNT/$CLUSTER.config 
-      KUBE_CONTEXT=$CLUSTER
-    else
-      KUBE_CONFIG_FILE=$ACCOUNT/default.config
-      KUBE_CONTEXT=$ACCOUNT-$ROLE
-    fi
-  fi
+    KUBE_CONFIG_FILE=$HOME/.kube/$ACCOUNT/$CLUSTER.config 
+    KUBE_CONTEXT=$ACCOUNT-$CLUSTER
 
-  # Configure AWS & Kubernetes
-  export AWS_SDK_LOAD_CONFIG=1
-  export AWS_PROFILE=${AWSPROF}
-  KUBECONFIG=$HOME/.kube/${KUBE_CONFIG_FILE}
-  export KUBECONFIG=$KUBECONFIG
-  kubectl config use-context ${KUBE_CONTEXT}
+    # Configure AWS & Kubernetes
+    export AWS_SDK_LOAD_CONFIG=1
+    export AWS_PROFILE=${AWSPROF}
+    export KUBECONFIG=$KUBE_CONFIG_FILE
+    kubectl config use-context ${KUBE_CONTEXT}
+  fi
 
   # Use correct KOPS version
   if [[ -f $HOME/.kube/$ACCOUNT/kops ]]; then
