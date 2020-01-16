@@ -57,6 +57,8 @@ eval "$(pyenv virtualenv-init -)"
 source ~/dotfiles/common/scripts.sh
 source ~/dotfiles/common/aws_scripts.sh
 source ~/dotfiles/common/kube_scripts.sh
+# Source additional scripts symlinked from other repositories
+for f in ~/dotfiles/sourced_scripts/*; do source $f; done
 
 # --------------------------------------------------------------------------- #
 # History
