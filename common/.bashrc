@@ -16,7 +16,8 @@ PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 export PATH="/usr/local/opt/openssl/bin:$PATH"
 
 # Configure prompt
-source ~/dotfiles/common/prompt.sh
+# Note: Disabled, delegating to kubernetes repo
+# source ~/dotfiles/common/prompt.sh
 
 # Kube config, allowing multiple config files. Initially load all configs.
 # Explicitly loading default.config first, using it to specify the default context
@@ -55,8 +56,11 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
 source ~/dotfiles/common/scripts.sh
+# Note: Disabled, delegating to kubernetes repo
+# source ~/dotfiles/common/set_workspace.sh
 source ~/dotfiles/common/aws_scripts.sh
 source ~/dotfiles/common/kube_scripts.sh
+
 # Source additional scripts symlinked from other repositories
 for f in ~/dotfiles/sourced_scripts/*; do source $f; done
 
