@@ -19,6 +19,10 @@ export PATH="/usr/local/opt/openssl/bin:$PATH"
 # Note: Disabled, delegating to kubernetes repo
 # source ~/dotfiles/common/prompt.sh
 
+# Source additional scripts symlinked from other repositories
+# TODO: Figure out why having prompt script sourced at end prevents VIRTUAL_ENV from being set (and by that, venv name being visible in prompt)
+for f in ~/dotfiles/sourced_scripts/*; do source $f; done
+
 # Kube config, allowing multiple config files. Initially load all configs.
 # Explicitly loading default.config first, using it to specify the default context
 # which is the first current-context encountered (See: https://coreos.com/blog/kubectl-tips-and-tricks)
@@ -60,9 +64,6 @@ source ~/dotfiles/common/scripts.sh
 # source ~/dotfiles/common/set_workspace.sh
 source ~/dotfiles/common/aws_scripts.sh
 source ~/dotfiles/common/kube_scripts.sh
-
-# Source additional scripts symlinked from other repositories
-for f in ~/dotfiles/sourced_scripts/*; do source $f; done
 
 # --------------------------------------------------------------------------- #
 # History

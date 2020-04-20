@@ -83,6 +83,28 @@ aws_asg_terminate() {
   aws autoscaling terminate-instance-in-auto-scaling-group --instance-id $INSTANCE_ID --should-decrement-desired-capacity
 }
 
+
+aws_s3_bucket_size() {
+  _show_help "$(cat <<-HELP
+Display bucket size and object count using Cloudwatch.
+
+Usage:
+  aws_s3_bucket_size <bucket-name>
+HELP
+)" 1 "$@" || return 0 
+
+  # See: https://serverfault.com/questions/84815/how-can-i-get-the-size-of-an-amazon-s3-bucket
+  BUCKET=$1
+  NOW=$(date +%s)
+
+  bytes=$(aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time "$(echo "$now - 86400" | bc)" --end-time "$now" --period 86400 --statistics Average --metric-name BucketSizeBytes --dimensions Name=BucketName,Value="$BUCKET" Name=StorageType,Value=StandardStorage |jq -r .Datapoints[0].Average)
+  items=$(aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time "$(echo "$NOW - 86400" | bc)" --end-time "$NOW" --period 86400 --statistics Average --metric-name NumberOfObjects --dimensions Name=BucketName,Value="$BUCKET" Name=StorageType,Value=AllStorageTypes |jq -r .Datapoints[0].Average)
+  
+  echo "Size (Gb): $(echo "scale=2; $bytes / 1024^3" | bc)"
+  echo "Number of objects: $items"
+}
+
+
 # Set AWS profile
 # 
 # Usage:
