@@ -96,13 +96,27 @@ HELP
   # See: https://serverfault.com/questions/84815/how-can-i-get-the-size-of-an-amazon-s3-bucket
   BUCKET=$1
   NOW=$(date +%s)
+  AVG_SIZE=172800
 
-  bytes=$(aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time "$(echo "$now - 86400" | bc)" --end-time "$now" --period 86400 --statistics Average --metric-name BucketSizeBytes --dimensions Name=BucketName,Value="$BUCKET" Name=StorageType,Value=StandardStorage |jq -r .Datapoints[0].Average)
-  items=$(aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time "$(echo "$NOW - 86400" | bc)" --end-time "$NOW" --period 86400 --statistics Average --metric-name NumberOfObjects --dimensions Name=BucketName,Value="$BUCKET" Name=StorageType,Value=AllStorageTypes |jq -r .Datapoints[0].Average)
-  
+  bytes=$(aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time "$(echo "$now - $AVG_SIZE" | bc)" --end-time "$now" --period $AVG_SIZE --statistics Average --metric-name BucketSizeBytes --dimensions Name=BucketName,Value="$BUCKET" Name=StorageType,Value=StandardStorage |jq -r .Datapoints[0].Average)
+  items=$(aws cloudwatch get-metric-statistics --namespace AWS/S3 --start-time "$(echo "$NOW - $AVG_SIZE" | bc)" --end-time "$NOW" --period $AVG_SIZE --statistics Average --metric-name NumberOfObjects --dimensions Name=BucketName,Value="$BUCKET" Name=StorageType,Value=AllStorageTypes |jq -r .Datapoints[0].Average)
+
   echo "Size (Gb): $(echo "scale=2; $bytes / 1024^3" | bc)"
   echo "Number of objects: $items"
 }
+
+
+aws_ecr_login() {
+  _show_help "$(cat <<-HELP
+    Login into ECR using the currently active AWS profile.
+HELP
+)" 0 "$@" || return 0
+  REGION=$(aws configure get region)
+  ACCOUNT=$(aws sts get-caller-identity | jq -r .Account)
+  ECR_REPOSITORY="${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com"
+  echo "Logging in into ${ECR_REPOSITORY}"
+  aws ecr get-login-password | docker login --password-stdin --username AWS ${ECR_REPOSITORY}
+} 
 
 
 # Set AWS profile
