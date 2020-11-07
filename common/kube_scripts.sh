@@ -73,3 +73,24 @@ HELP
   kubectl port-forward $(kubectl get pod --selector $SELECTOR -o jsonpath={.items..metadata.name} -n $NAMESPACE) -n $NAMESPACE $PORTS
   set +x
 }
+
+
+kube_images() {
+  _show_help "$(cat <<-HELP
+Show all images in namespace or all namespaces
+     
+Example:
+  kube_images
+  kube_images kube-system
+HELP
+  )" 1 "$@" || return 0	
+
+  NAMESPACE=$1
+  if [ -z "$NAMESPACE" ]; then
+    NS_ARG="--all-namespaces"
+  else
+    NS_ARG="-n ${NAMESPACE}"
+  fi
+
+  kubectl get pods $NS_ARG -o jsonpath="{.items[*].spec.containers[*].image}" |tr -s '[[:space:]]' '\n' |sort |uniq -c
+}
