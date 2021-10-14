@@ -19,6 +19,14 @@ export PATH="/usr/local/opt/openssl/bin:$PATH"
 # Note: Disabled, delegating to kubernetes repo
 # source ~/dotfiles/common/prompt.sh
 
+
+if command -v pyenv 1>/dev/null 2>&1; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
+fi
+
 # Source additional scripts symlinked from other repositories
 # TODO: Figure out why having prompt script sourced at end prevents VIRTUAL_ENV from being set (and by that, venv name being visible in prompt)
 for f in ~/dotfiles/sourced_scripts/*; do source $f; done
@@ -38,6 +46,11 @@ export LANG=en_US.UTF-8
 # Load RVM into a shell session *as a function*
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
+# NVM (Node Version Manager)
+export NVM_DIR="$HOME/.nvm"
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
 # Fixing SOPS-GPG integration
 # See: https://github.com/mozilla/sops/issues/304#issuecomment-377195341
 GPG_TTY=$(tty)
@@ -54,10 +67,6 @@ SSH_HOSTS_CONFIG=$(perl -ne 'print "$1 " if /^Host (.+)$/' ~/.ssh/config)
 SSH_HOSTS="$SSH_HOSTS_KNOWN $SSH_HOSTS_CONFIG"
 complete -o plusdirs -o filenames -W "$SSH_HOSTS" scp 
 complete -W "$SSH_HOSTS" ssh 
-
-export PYENV_ROOT="$HOME/.pyenv"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 
 source ~/dotfiles/common/scripts.sh
 # Note: Disabled, delegating to kubernetes repo

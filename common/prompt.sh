@@ -25,12 +25,20 @@ function __kube_context() {
 }
 
 function __virtualenv() {
-  # python virtualenv
+  # python virtualenv (old implementation)
   if [ -z "$VIRTUAL_ENV" ]; then
       echo -en ""
-    else
+  else
       echo -en "${yellow}(`basename \"$VIRTUAL_ENV\"`)${reset} "
+  fi
+
+  # recent pyenv
+  if type "pyenv" > /dev/null 2>&1; then
+    local PYENV_VERSION_NAME=$(pyenv version-name)
+    if [[ ${PYENV_VERSION_NAME} != "system" ]]; then
+        echo -en "${yellow}(${PYENV_VERSION_NAME})${reset} "
     fi
+fi
 }
 
 # Display the branch name of git repository

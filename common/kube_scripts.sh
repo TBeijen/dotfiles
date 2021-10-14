@@ -83,7 +83,7 @@ Example:
   kube_images
   kube_images kube-system
 HELP
-  )" 1 "$@" || return 0	
+  )" 0 "$@" || return 0
 
   NAMESPACE=$1
   if [ -z "$NAMESPACE" ]; then
