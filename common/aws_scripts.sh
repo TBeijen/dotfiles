@@ -173,4 +173,76 @@ aws_set_profile() {
 aws_get_profiles() {
     grep -E "^\[.+\]$" ~/.aws/config | sed -e 's!\[!!g' -e 's!profile !!g' -e 's!\]!!g'
 }
+
+aws_mfa() {
+  # Loosely based on https://github.com/sweharris/aws-cli-mfa/blob/master/get-aws-creds
+  # @TODO better integrate with profile assume_role config. Now it's probably possible to switch workspace having mismatch between prompt and env vars set by this script
+  # @TODO simplify, maybe use jq like elsewhere
+  _show_help "$(cat <<-HELP
+Get session credentials using registered MFA device.
+Will clear any existing session env vars.
+
+Usage:
+  aws_mfa <mfa-code>
+  aws_mfa 123654
+HELP
+)" 1 "$@" || return 0
+  CODE=$1
+
+  if [ -n "$AWS_SESSION_TOKEN" ]
+  then
+    echo "Clearing exsting session credentials."
+    unset AWS_SESSION_TOKEN AWS_SECRET_ACCESS_KEY AWS_ACCESS_KEY_ID
+  fi
+
+  identity=$(aws sts get-caller-identity)
+  username=$(echo -- "$identity" | sed -n 's!.*"arn:aws:iam::.*:user/\(.*\)".*!\1!p')
+  if [ -z "$username" ]
+  then
+    echo "Can not identify who you are.  Looking for a line like 'arn:aws:iam::.....:user/FOO_BAR' but did not find one in the output of
+    aws sts get-caller-identity
+      $identity" >&2
+    exit 255
+  fi
+
+  echo You are: $username >&2
+
+  mfa=$(aws iam list-mfa-devices --user-name "$username")
+  device=$(echo -- "$mfa" | sed -n 's!.*"SerialNumber": "\(.*\)".*!\1!p')
+  if [ -z "$device" ]
+  then
+    echo "Can not find any MFA device for you. Looking for a SerialNumber but did not find one in the output of
+    aws iam list-mfa-devices --username \"$username\"
+      $mfa" >&2
+    exit 255
+  fi
+
+  echo Your MFA device is: $device >&2
+
+  tokens=$(aws sts get-session-token --serial-number "$device" --token-code $CODE)
+
+  secret=$(echo -- "$tokens" | sed -n 's!.*"SecretAccessKey": "\(.*\)".*!\1!p')
+  session=$(echo -- "$tokens" | sed -n 's!.*"SessionToken": "\(.*\)".*!\1!p')
+  access=$(echo -- "$tokens" | sed -n 's!.*"AccessKeyId": "\(.*\)".*!\1!p')
+  expire=$(echo -- "$tokens" | sed -n 's!.*"Expiration": "\(.*\)".*!\1!p')
+
+  if [ -z "$secret" -o -z "$session" -o -z "$access" ]
+  then
+    echo "Unable to get temporary credentials.  Could not find secret/access/session entries
+      $tokens" >&2
+    exit 255
+  fi
+
+  export AWS_PROFILE=$AWS_PROFILE
+  export AWS_SESSION_TOKEN=$session
+  export AWS_SECRET_ACCESS_KEY=$secret
+  export AWS_ACCESS_KEY_ID=$access
+
+  echo Keys valid until $expire >&2
+
+
+
+
+}
+
 complete -W "$(aws_get_profiles)" aws_set_profile
