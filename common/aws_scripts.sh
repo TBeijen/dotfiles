@@ -118,6 +118,34 @@ HELP
   aws ecr get-login-password | docker login --password-stdin --username AWS ${ECR_REPOSITORY}
 } 
 
+aws_ec2_find() {
+  _show_help "$(cat <<-HELP
+Find ec2 instance id by its private dns/host name or private ip address.
+
+Returns the i-nnnnnnn instance id, which can be used directly in ssh when having configured https://github.com/qoomon/aws-ssm-ec2-proxy-command
+
+Usage:
+  aws_ec2_find ip-10-11-12-13.eu-west-1.compute.internal
+  ssh \$(aws_ec2_find ip-10-11-12-13.eu-west-1.compute.internal)
+HELP
+)" 1 "$@" || return 0
+  SEARCH=$1
+
+  # --filter using OR seems tricky, first attempt: by dns name
+  INSTANCE_IDS=$(aws ec2 describe-instances --output=json --filter Name=private-dns-name,Values="${SEARCH}" |jq -r '.Reservations[].Instances[].InstanceId')
+  if [ $(echo $INSTANCE_IDS |wc -w) -ne "1" ]; then
+    # Second attempt: by private ip
+    INSTANCE_IDS=$(aws ec2 describe-instances --output=json --filter Name=private-ip-address,Values="${SEARCH}" |jq -r '.Reservations[].Instances[].InstanceId')
+  fi
+
+  # Evaluate, print or return 1
+  if [ $(echo $INSTANCE_IDS |wc -w) -eq "1" ]; then
+    echo $INSTANCE_IDS
+  else
+    return 1
+  fi
+}
+
 
 # Set AWS profile
 # 

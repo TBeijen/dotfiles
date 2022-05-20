@@ -56,6 +56,10 @@ export NVM_DIR="$HOME/.nvm"
 GPG_TTY=$(tty)
 export GPG_TTY
 
+# asdf
+# (echo -e "\n. $(brew --prefix asdf)/libexec/asdf.sh")
+. /usr/local/opt/asdf/libexec/asdf.sh
+
 # --------------------------------------------------------------------------- #
 # Aliases and auto completion
 # --------------------------------------------------------------------------- #

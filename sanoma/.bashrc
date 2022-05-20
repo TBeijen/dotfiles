@@ -3,8 +3,9 @@ if [ -f ~/dotfiles/common/.bashrc ]; then
    source ~/dotfiles/common/.bashrc
 fi
 
-
+# GOlang
 export GOPATH=~/projects/go_repos/
+export PATH="$GOPATH/bin:$PATH"
 
 # BFG Repo-Cleaner
 alias bfg="java -jar ~/bin/bfg.jar"
