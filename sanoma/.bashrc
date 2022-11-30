@@ -10,6 +10,9 @@ export PATH="$GOPATH/bin:$PATH"
 # BFG Repo-Cleaner
 alias bfg="java -jar ~/bin/bfg.jar"
 
+# Trying podman
+alias docker_real="/usr/local/bin/docker"
+alias docker="/usr/local/bin/podman"
 
 # --------------------------------------------------------------------------- #
 # Applications

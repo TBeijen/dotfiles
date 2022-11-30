@@ -114,8 +114,18 @@ HELP
   REGION=$(aws configure get region)
   ACCOUNT=$(aws sts get-caller-identity | jq -r .Account)
   ECR_REPOSITORY="${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com"
-  echo "Logging in into ${ECR_REPOSITORY}"
-  aws ecr get-login-password | docker login --password-stdin --username AWS ${ECR_REPOSITORY}
+
+  if command -v podman &> /dev/null
+  then
+      DOCKER_BINARY=podman
+      # Sync Podman VM datetime, see: https://github.com/containers/podman/issues/11541#issuecomment-1176464030
+      podman machine ssh sudo date --set $(date +'%Y-%m-%dT%H:%M:%S')
+  else
+      DOCKER_BINARY=docker
+  fi
+
+  echo "Logging in into ${ECR_REPOSITORY} (using ${DOCKER_BINARY})"
+  aws ecr get-login-password | ${DOCKER_BINARY} login --password-stdin --username AWS ${ECR_REPOSITORY}
 } 
 
 aws_ec2_find() {

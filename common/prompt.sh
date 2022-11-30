@@ -19,7 +19,7 @@ function __awsprofile() {
 }
 
 function __kube_context() {
-  if [ -d ~/.kube ]; then
+  if [ -d ~/.kube ] && [ -f "${KUBECONFIG}" ]; then
     echo -en "${blue}${bold}[$(kubectl config current-context)]${reset} "
   fi
 }
