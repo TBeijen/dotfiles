@@ -15,9 +15,9 @@ function __status() {
 function __awsprofile() {
   local promptColor="%F{208}"
   if [ -z $AWS_PROFILE ]; then
-      local prompt="${promptColor}[default]%{$reset_color%} "
+      local prompt="${promptColor}[default]%{$reset_color%}%f "
   else
-      local prompt="${promptColor}[$AWS_PROFILE]%{$reset_color%} "
+      local prompt="${promptColor}[$AWS_PROFILE]%{$reset_color%}%f "
   fi
 
   local prompt=$(echo $prompt |sed "s/prod/%B%F{196}PROD%b%f${promptColor}/")
@@ -38,7 +38,7 @@ function __gitprompt() {
   local promptColor="%F{116}"
   local git_status="`git status -unormal 2>&1`"
 
-  if ! [[ "$git_status" =~ Not\ a\ git\ repo ]]; then
+  if ! [[ "$git_status" =~ not\ a\ git\ repo ]]; then
     # Status icon
     if [[ "$git_status" =~ nothing\ to\ commit ]]; then
       local statusIcon=""
@@ -78,7 +78,7 @@ function __gitprompt() {
       local separator=" "
     fi
 
-    echo -ne "${promptColor}[${branch}${separator}${remoteIcon}${statusIcon}${promptColor}]%{$reset_color%} "
+    echo -ne "${promptColor}[${branch}${separator}${remoteIcon}${statusIcon}${promptColor}]%{$reset_color%}%f "
   fi
 }
 
