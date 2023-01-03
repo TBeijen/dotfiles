@@ -66,7 +66,7 @@ export GPG_TTY
 alias ll="ls -lahG"
 
 # Auto-complete ssh command based on both known_hosts and ssh config
-SSH_HOSTS_KNOWN="$(echo `cat ~/.ssh/known_hosts | cut -f 1 -d ' ' | sed -e s/,.*//g | uniq | grep -v "\["`;)"
+SSH_HOSTS_KNOWN="$(echo `cat ~/.ssh/known_hosts | cut -f 1 -d ' ' | sed -e "s/,.*//g" | uniq | grep -v "\["`;)"
 SSH_HOSTS_CONFIG=$(perl -ne 'print "$1 " if /^Host (.+)$/' ~/.ssh/config)
 SSH_HOSTS="$SSH_HOSTS_KNOWN $SSH_HOSTS_CONFIG"
 complete -o plusdirs -o filenames -W "$SSH_HOSTS" scp 
