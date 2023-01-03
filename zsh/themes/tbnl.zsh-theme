@@ -82,6 +82,15 @@ function __gitprompt() {
   fi
 }
 
+function __virtualenv() {
+  if type "pyenv" > /dev/null 2>&1; then
+    local PYENV_VERSION_NAME=$(pyenv version-name)
+    if [[ ${PYENV_VERSION_NAME} != "system" ]]; then
+        echo -en "%F{142}(${PYENV_VERSION_NAME})%{$reset_color%} "
+    fi
+  fi
+}
+
 function __path() {
   echo -ne "%{$fg[cyan]%}%c%{$reset_color%} "
 }
@@ -94,6 +103,7 @@ PROMPT=""
 PROMPT+='$(__status)'
 PROMPT+='$(__awsprofile)'
 PROMPT+='$(__kubecontext)'
+PROMPT+='$(__virtualenv)'
 PROMPT+='$(__path)'
 PROMPT+='$(__gitprompt)'
 PROMPT+='$(__prompt)'
