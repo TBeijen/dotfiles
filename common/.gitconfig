@@ -12,6 +12,9 @@
 [pull]
 	ff = only
 [alias]
+	# Inline formatted log, including branches. Example: 'git l', 'git l 5'
+	l = "!f() { LESS="-FXR" git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(yellow)%h%C(reset) %C(green)(%ar)%C(reset) - %C(cyan)%an%C(reset) - %C(white)%aD%C(reset) -%C(bold red)%d%C(reset) %C(dim white)%s%C(reset)' -n${1:-1}; }; f"
+
     lot = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(yellow)%h%C(reset) %C(green)(%ar)%C(reset) - %C(cyan)%an%C(reset) - %C(white)%aD%C(reset) -%C(bold red)%d%C(reset) %C(dim white)%s%C(reset)' --all
     hist = log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short
 	# See: https://coderwall.com/p/6l2paq/show-merged-and-unmerged-branches-in-git
