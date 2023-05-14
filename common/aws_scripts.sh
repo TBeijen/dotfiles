@@ -158,7 +158,7 @@ HELP
 
 aws_sso_to_iam() {
   _show_help "$(cat <<-HELP
-    Use cached SSO credentials to obtain AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_SESSION_TOKEN for the currently active profile
+    Use cached SSO credentials to obtain AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_SESSION_TOKEN for the currently active profile. Returns json wrapped in 'roleCredentials'.
 HELP
 )" 0 "$@" || return 0
   token=$(find ~/.aws/sso/cache -type f -name '*.json' -exec jq -r -e 'select(has("accessToken") and (.expiresAt | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) > now) | .accessToken' {} \; |head -n1)
