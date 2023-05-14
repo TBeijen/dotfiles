@@ -156,6 +156,33 @@ HELP
   fi
 }
 
+aws_sso_to_iam() {
+  _show_help "$(cat <<-HELP
+    Use cached SSO credentials to obtain AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_SESSION_TOKEN for the currently active profile
+HELP
+)" 0 "$@" || return 0
+  token=$(find ~/.aws/sso/cache -type f -name '*.json' -exec jq -r -e 'select(has("accessToken") and (.expiresAt | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) > now) | .accessToken' {} \; |head -n1)
+
+  if [ -z "$token" ]; then
+    echo "No SSO access token found. Probably the session has expired. Log in using:\n\naws sso login"
+    return 1
+  fi
+
+  if [ -z "$AWS_PROFILE" ]; then
+    echo "Be sure to activate a profile"
+    return 1
+  fi
+
+  section=$(sed -n '/^\[profile '"$AWS_PROFILE"'\]/,/^$/p' ~/.aws/config)
+
+  aws_account_id=$(echo "$section" | awk -F ' = ' '/^sso_account_id/{print $2}')
+  sso_role_name=$(echo "$section" | awk -F ' = ' '/^sso_role_name/{print $2}')
+  region=$(echo "$section" | awk -F ' = ' '/^region/{print $2}')
+
+  LESS="-FXR" aws sso get-role-credentials --account-id $aws_account_id --role-name $sso_role_name --access-token "$token" --region $region
+}
+
+
 
 # Set AWS profile
 # 
