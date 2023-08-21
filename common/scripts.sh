@@ -44,29 +44,34 @@ Usage:
   git_merged delete all
 HELP
   )" 1 "$@" || return 0
-  set -e
 
-  # Script constants
-  BRANCH_WHITELIST="(\*|master|develop)"
-  REMOTES="origin"  # Add more remotes here as space-separated list
+  # subshell, so -e exits function, not terminal
+  (
+    set -e
 
-  # local
-  if [[ $2 == "local" || $2 == "all" ]]; then
-    for branch in $(git branch --merged master | egrep -v "$BRANCH_WHITELIST"); do
-      if [[ $1 == "show" ]]; then echo "${branch}"; fi
-      if [[ $1 == "delete" ]]; then git branch -d "${branch}"; fi
-    done
-  fi
+    # Script constants
+    BRANCH_WHITELIST="(\*|master|develop|osc-nu-test)"
+    REMOTES="origin"  # Add more remotes here as space-separated list
 
-  # remotes
-  if [[ $2 == "remote" || $2 == "all" ]]; then
-    for remote in "$REMOTES"; do
-      git fetch "$remote" --prune
-      for branch in $(git branch -r --merged master | grep "$remote" | egrep -v "$BRANCH_WHITELIST"); do
+    # local
+    if [[ $2 == "local" || $2 == "all" ]]; then
+      for branch in $(git branch --merged master | egrep -v "$BRANCH_WHITELIST"); do
         if [[ $1 == "show" ]]; then echo "${branch}"; fi
-        #  '#*/' part removes the preceding 'origin/' part from the branch name
-        if [[ $1 == "delete" ]]; then git push "${remote}" --delete "${branch#*/}"; fi
+        if [[ $1 == "delete" ]]; then git branch -d "${branch}"; fi
       done
-    done
-  fi
+    fi
+
+    # remotes
+    if [[ $2 == "remote" || $2 == "all" ]]; then
+      for remote in "$REMOTES"; do
+        git fetch "$remote" --prune
+        for branch in $(git branch -r --merged master | grep "$remote" | egrep -v "$BRANCH_WHITELIST"); do
+          if [[ $1 == "show" ]]; then echo "${branch}"; fi
+          #  '#*/' part removes the preceding 'origin/' part from the branch name
+          if [[ $1 == "delete" ]]; then git push "${remote}" --delete --no-verify "${branch#*/}"; fi
+        done
+      done
+    fi
+  )
 }
+
