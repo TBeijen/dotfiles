@@ -76,7 +76,7 @@ ZSH_CUSTOM="$HOME/dotfiles/zsh"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 # plugins=(aws kube-ps1 virtualenv git)
-plugins=()
+plugins=(t3-scripts)
 
 source $ZSH/oh-my-zsh.sh
 
