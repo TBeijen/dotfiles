@@ -4,7 +4,7 @@
 ssh-add -A 2>/dev/null
 
 # Adding path
-PATH="$HOME/.local/bin/:$PATH"
+PATH="$HOME/.local/bin/:$PATH:$HOME/Library/Python/3.9/bin"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
