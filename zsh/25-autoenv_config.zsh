@@ -1,0 +1,4 @@
+export AUTOENV_ENV_FILENAME=.envrc
+export AUTOENV_ENV_LEAVE_FILENAME=.envrc.leave
+export AUTOENV_ENABLE_LEAVE=True
+
