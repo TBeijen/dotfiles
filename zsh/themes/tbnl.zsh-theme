@@ -26,7 +26,7 @@ function __awsprofile() {
 
 function __kubecontext() {
   local promptColor="%F{12}"
-  if [ -d ~/.kube ] && [ -f "${KUBECONFIG}" ]; then
+  if [ -d ~/.kube ] || [ -f "${KUBECONFIG}" ]; then
     local prompt="${promptColor}[$(kubectl config current-context)]%{$reset_color%} "
     local prompt=$(echo $prompt |sed "s/prod/%B%F{196}PROD%b%f${promptColor}/")
     echo -en "${prompt}"
