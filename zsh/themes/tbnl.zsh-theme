@@ -24,6 +24,18 @@ function __awsprofile() {
   echo -en "${prompt}"
 }
 
+function __azinfo() {
+  local promptColor="%F{39}"
+  azgs=$(jq -r '.subscriptions[] | select(.isDefault==true) .name' "${AZURE_CONFIG_DIR:-$HOME/.azure}/azureProfile.json" 2>/dev/null)
+  if [ -z $azgs ]; then
+      local prompt=""
+  else
+      local prompt="${promptColor}[az:$azgs]%{$reset_color%}%f "
+  fi
+
+  echo -en "${prompt}"
+}
+
 function __kubecontext() {
   local promptColor="%F{12}"
   if [ -d ~/.kube ] || [ -f "${KUBECONFIG}" ]; then
@@ -102,6 +114,7 @@ function __prompt() {
 PROMPT=""
 PROMPT+='$(__status)'
 PROMPT+='$(__awsprofile)'
+PROMPT+='$(__azinfo)'
 PROMPT+='$(__kubecontext)'
 PROMPT+='$(__virtualenv)'
 PROMPT+='$(__path)'
