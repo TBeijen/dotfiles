@@ -94,6 +94,20 @@ function __gitprompt() {
   fi
 }
 
+function __tfworkspace() {
+  local promptColor="%F{99}"
+  if [ -d .terraform ]; then
+      local workspace="$(command terraform workspace show 2>/dev/null)"
+  fi
+
+  if [[ ! -z "${workspace}" ]]; then
+    local prompt="${promptColor}[tf:$workspace]%{$reset_color%} "
+  else
+    local prompt=""
+  fi
+  echo -en "${prompt}"
+}
+
 function __virtualenv() {
   if type "pyenv" > /dev/null 2>&1; then
     local PYENV_VERSION_NAME=$(pyenv version-name)
@@ -117,6 +131,7 @@ PROMPT+='$(__awsprofile)'
 PROMPT+='$(__azinfo)'
 PROMPT+='$(__kubecontext)'
 PROMPT+='$(__virtualenv)'
+PROMPT+='$(__tfworkspace)'
 PROMPT+='$(__path)'
 PROMPT+='$(__gitprompt)'
 PROMPT+='$(__prompt)'
