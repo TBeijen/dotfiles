@@ -3,10 +3,11 @@
 tf() {
   if [ -d .terraform ]; then
     echo "$@"
-    if echo "$@" | grep -qE "plan|apply|destroy"; then
+    if echo "$@" | grep -qE "plan|apply|destroy|import|state"; then
       local workspace="$(command terraform workspace show 2>/dev/null)"
       local vars_arg="-var-file=$(command terraform workspace show 2>/dev/null).tfvars"
     fi
   fi
+  echo "terraform $@ ${vars_arg}"
   command terraform "$@" ${vars_arg}
 }
