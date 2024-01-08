@@ -49,13 +49,17 @@ HELP
   (
     set -e
 
+    MAIN_BRANCH=$({ git for-each-ref --format='%(refname:short)' refs/heads/master;
+      git for-each-ref --format='%(refname:short)' refs/heads/main;
+    } | head -1)
+
     # Script constants
-    BRANCH_WHITELIST="(\*|master|develop|osc-nu-test)"
+    BRANCH_WHITELIST="(\*|master|main|develop)"
     REMOTES="origin"  # Add more remotes here as space-separated list
 
     # local
     if [[ $2 == "local" || $2 == "all" ]]; then
-      for branch in $(git branch --merged master | egrep -v "$BRANCH_WHITELIST"); do
+      for branch in $(git branch --merged $MAIN_BRANCH | egrep -v "$BRANCH_WHITELIST"); do
         if [[ $1 == "show" ]]; then echo "${branch}"; fi
         if [[ $1 == "delete" ]]; then git branch -d "${branch}"; fi
       done
@@ -65,7 +69,7 @@ HELP
     if [[ $2 == "remote" || $2 == "all" ]]; then
       for remote in "$REMOTES"; do
         git fetch "$remote" --prune
-        for branch in $(git branch -r --merged master | grep "$remote" | egrep -v "$BRANCH_WHITELIST"); do
+        for branch in $(git branch -r --merged $MAIN_BRANCH | grep "$remote" | egrep -v "$BRANCH_WHITELIST"); do
           if [[ $1 == "show" ]]; then echo "${branch}"; fi
           #  '#*/' part removes the preceding 'origin/' part from the branch name
           if [[ $1 == "delete" ]]; then git push "${remote}" --delete --no-verify "${branch#*/}"; fi
