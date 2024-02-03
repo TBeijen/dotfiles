@@ -21,6 +21,16 @@ function __awsprofile() {
   fi
 
   local prompt=$(echo $prompt |sed "s/prod/%B%F{196}PROD%b%f${promptColor}/")
+
+  # WS_PROFILE_SAFE_SUFFIX is set, color that green
+  if [ ! -z $WS_PROFILE_UNSAFE_MARKER ]; then
+    local prompt=$(echo $prompt |sed "s/${WS_PROFILE_UNSAFE_MARKER}/%B%F{196}${WS_PROFILE_UNSAFE_MARKER}%b%f${promptColor}/")
+  fi
+
+  # WS_PROFILE_SAFE_MARKER is set, color that green
+  if [ ! -z $WS_PROFILE_SAFE_MARKER ]; then
+    local prompt=$(echo $prompt |sed "s/${WS_PROFILE_SAFE_MARKER}/%{$fg[green]%}${WS_PROFILE_SAFE_MARKER}%{$reset_color%}${promptColor}/")
+  fi
   echo -en "${prompt}"
 }
 

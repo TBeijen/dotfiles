@@ -239,7 +239,7 @@ HELP
     echo "Can not identify who you are.  Looking for a line like 'arn:aws:iam::.....:user/FOO_BAR' but did not find one in the output of
     aws sts get-caller-identity
       $identity" >&2
-    exit 255
+    return 255
   fi
 
   echo You are: $username >&2
@@ -251,7 +251,7 @@ HELP
     echo "Can not find any MFA device for you. Looking for a SerialNumber but did not find one in the output of
     aws iam list-mfa-devices --username \"$username\"
       $mfa" >&2
-    exit 255
+    return 255
   fi
 
   echo Your MFA device is: $device >&2
@@ -267,7 +267,7 @@ HELP
   then
     echo "Unable to get temporary credentials.  Could not find secret/access/session entries
       $tokens" >&2
-    exit 255
+    return 255
   fi
 
   export AWS_PROFILE=$AWS_PROFILE
