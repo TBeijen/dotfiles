@@ -63,5 +63,7 @@ sw() {
       return 1
     fi
     export KUBECONFIG=${WS_KUBE_CONFIG}
+  else 
+    unset KUBECONFIG
   fi
 }
