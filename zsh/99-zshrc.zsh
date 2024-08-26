@@ -16,5 +16,8 @@ eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 unset PYENV_SHELL
+# See: https://github.com/pyenv/pyenv-virtualenv/blob/master/bin/pyenv-sh-activate
+# Avoid entering pyenv dir to prepend venv name to zsh prompt
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 
 export GPG_TTY=$(tty)
