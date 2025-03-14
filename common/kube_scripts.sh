@@ -75,13 +75,13 @@ HELP
 }
 
 
-kube_images() {
+kube_pod_images() {
   _show_help "$(cat <<-HELP
-Show all images in namespace or all namespaces
-     
+Show pod images in namespace or all namespaces
+
 Example:
-  kube_images
-  kube_images kube-system
+  kube_pod_images
+  kube_pod_images kube-system
 HELP
   )" 0 "$@" || return 0
 
@@ -93,4 +93,32 @@ HELP
   fi
 
   kubectl get pods $NS_ARG -o jsonpath="{.items[*].spec.containers[*].image}" |tr -s '[[:space:]]' '\n' |sort |uniq -c
+}
+
+kube_all_images() {
+  _show_help "$(cat <<-HELP
+Show all images in namespace or all namespaces, as defined in various k8s objects
+
+Example:
+  kube_all_images ns1 ns2
+HELP
+  )" 1 "$@" || return 0
+
+	local namespaces=("$@")
+
+	for ns in $namespaces; do
+	  echo "Namespace: $ns"
+	  kubectl get deployments,statefulsets,daemonsets,cronjobs,jobs,replicasets -o json -n $ns | \
+	  jq -r --arg ns "$ns" '.items[] |
+	    .metadata.name as $name |
+	    .kind as $kind |
+	    (.spec.template.spec.initContainers[]? |
+	      "\($ns): \($kind)/\($name) - spec.template.spec.initContainers[].image = \(.image)"),
+	    (.spec.template.spec.containers[]? |
+	      "\($ns): \($kind)/\($name) - spec.template.spec.containers[].image = \(.image)"),
+	    (.spec.jobTemplate.spec.template.spec.initContainers[]? |
+	      "\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.initContainers[].image = \(.image)"),
+	    (.spec.jobTemplate.spec.template.spec.containers[]? |
+	      "\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.containers[].image = \(.image)")'
+	done
 }
