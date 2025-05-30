@@ -8,7 +8,7 @@
     "red": "#D81E5B",
     "white": "#E0DEF4",
     "yellow": "#F3AE35",
-    "bg_grey": "#121421",
+    "bg_grey": "#202237",
     "bg_grey_light": "#5b64a4",
     "cyan": "#00ffd7",
     "red_bright": "#f00a55",
@@ -17,6 +17,7 @@
     "azure_blue": "#0078d4",
     "azure_blue_light": "#0a95ff",
     "k8s_blue": "#326CE5",
+    "nodejs_green": "#84ba64",
     "gold": "#afaf00"
   },
   "secondary_prompt": {
@@ -79,6 +80,7 @@
           "template": "\ue81d {{.Context}}{{if .Namespace}} :: {{.Namespace}}{{end}} "
         },
         {
+          "type": "python",
           "style": "diamond",
           "leading_diamond": "<transparent,p:bg_grey>\ue0b0</>",
           "trailing_diamond": "\ue0b0",
@@ -90,8 +92,16 @@
             "fetch_virtual_env": true,
             "fetch_version": true
           },
-          "template": "\ue235 {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{.Venv}}{{ else }}{{ .Full }}{{ end }}{{ end }} ",
-          "type": "python"
+          "template": "\ue235 {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{.Venv}}{{ else }}{{ .Full }}{{ end }}{{ end }} "
+        },
+        {
+          "type": "node",
+          "style": "diamond",
+          "leading_diamond": "<transparent,p:bg_grey>\ue0b0</>",
+          "trailing_diamond": "\ue0b0",
+          "foreground": "p:nodejs_green",
+          "background": "p:bg_grey",
+          "template": "\ued0d {{ .Full }} "
         },
         {
           "properties": {
