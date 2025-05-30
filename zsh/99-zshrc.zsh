@@ -37,3 +37,11 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# oh-my-posh
+if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+  # eval "$(oh-my-posh init zsh --config "$HOME/dotfiles/oh-my-posh-themes/froczah.json")"
+  # eval "$(oh-my-posh init zsh --config "$HOME/dotfiles/oh-my-posh-themes/new_config.omp.json")"
+  eval "$(oh-my-posh init zsh --config "$HOME/dotfiles/oh-my-posh-themes/tbnl-default.json")"
+fi
+# oh-my-posh end
