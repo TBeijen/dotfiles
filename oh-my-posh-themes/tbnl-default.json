@@ -54,6 +54,9 @@
         },
         {
           "type": "aws",
+          "properties": {
+            "display_default": false
+          },
           "style": "diamond",
           "leading_diamond": "<transparent,p:bg_grey>\ue0b0</>",
           "trailing_diamond": "\ue0b0",
