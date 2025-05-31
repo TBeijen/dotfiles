@@ -169,23 +169,12 @@
         {
           "background": "p:bg_grey",
           "foreground": "p:white",
-          "leading_diamond": "\ue0c5",
-          "properties": {
-            "style": "dallas",
-            "threshold": 0
-          },
-          "style": "diamond",
-          "template": "\ueba2 {{ .FormattedMs }}s ",
-          "type": "executiontime"
-        },
-        {
-          "background": "p:bg_grey",
-          "foreground": "p:white",
           "properties": {
             "time_format": "15:04:05 | Monday"
           },
-          "style": "plain",
-          "template": "<transparent> \ue0ba\ue0bc </>{{ .CurrentDate | date .Format }} ",
+          "style": "diamond",
+          "leading_diamond": "\ue0c5",
+          "template": "\uf017 {{ .CurrentDate | date .Format }} ",
           "type": "time"
         }
       ],
