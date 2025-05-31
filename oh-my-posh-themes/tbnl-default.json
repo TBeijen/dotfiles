@@ -152,6 +152,15 @@
             "{{ if gt .Ahead 0 }}#49416D{{ end }}",
             "{{ if gt .Behind 0 }}#7A306C{{ end }}"
           ]
+        },
+        {
+          "type": "text",
+          "style": "diamond",
+          "leading_diamond": "<transparent,p:red_bright>\ue0b0</>",
+          "trailing_diamond": "\ue0b0",
+          "background": "p:red_bright",
+          "foreground": "p:white",
+          "template": "{{ if or (matchP \"prod\" (lower .Segments.Kubectl.Cluster)) (and (.Segments.Contains \"Aws\") (matchP \"prod\" (lower .Segments.Aws.Profile))) }} \uf12a\uf12a\uf12a {{ else }}{{ end }}"
         }
       ]
     },
