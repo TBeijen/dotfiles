@@ -122,3 +122,65 @@ HELP
 	      "\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.containers[].image = \(.image)")'
 	done
 }
+
+kube_all_pod_images() {
+  _show_help "$(cat <<-HELP
+List all pod container images in the given namespaces, including initContainers and their resolved imageIDs.
+
+Example:
+  kube_all_pod_images ns1 ns2
+HELP
+  )" 1 "$@" || return 0
+
+  local namespaces=("$@")
+
+  for ns in "${namespaces[@]}"; do
+    echo "Namespace: $ns"
+    kubectl get pods -n "$ns" -o json | jq -r --arg ns "$ns" '
+      .items[] |
+      .metadata.name as $pod |
+      (
+        .spec.initContainers // [] |
+        map({
+          type: "initContainer",
+          name: .name,
+          image: .image
+        })
+      ) as $initSpecs |
+      (
+        .spec.containers // [] |
+        map({
+          type: "container",
+          name: .name,
+          image: .image
+        })
+      ) as $containerSpecs |
+      (
+        .status.initContainerStatuses // [] |
+        map({
+          name: .name,
+          imageID: .imageID
+        })
+      ) as $initStatuses |
+      (
+        .status.containerStatuses // [] |
+        map({
+          name: .name,
+          imageID: .imageID
+        })
+      ) as $containerStatuses |
+
+      ($initSpecs + $containerSpecs)[] |
+      .type as $type |
+      .name as $cname |
+      .image as $image |
+      (
+        ($initStatuses + $containerStatuses)[] | select(.name == $cname) | .imageID
+      ) as $imageID |
+      "\($ns)\t\($pod)\t\($type)\t\($image)\t\($imageID)"
+    ' | column -t -s $'\t'
+    echo ""
+  done
+}
+
+

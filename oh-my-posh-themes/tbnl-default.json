@@ -149,7 +149,7 @@
           "foreground_templates": [
             "{{ if or (.Working.Changed) (.Staging.Changed) }}p:yellow{{ end }}",
             "{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:red_bright{{ end }}",
-            "{{ if gt .Ahead 0 }}#49416D{{ end }}",
+            "{{ if gt .Ahead 0 }}#8980b3{{ end }}",
             "{{ if gt .Behind 0 }}#7A306C{{ end }}"
           ]
         },
