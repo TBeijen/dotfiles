@@ -160,7 +160,7 @@
           "trailing_diamond": "\ue0b0",
           "background": "p:red_bright",
           "foreground": "p:white",
-          "template": "{{ if or (matchP \"prod\" (lower .Segments.Kubectl.Cluster)) (and (.Segments.Contains \"Aws\") (matchP \"prod\" (lower .Segments.Aws.Profile))) }} \uf12a\uf12a\uf12a {{ else }}{{ end }}"
+          "template": "{{ if or (and (.Segments.Contains \"Kubectl\") (matchP \"prod\" (lower .Segments.Kubectl.Cluster)) (not (matchP \"-non-prod\" (lower .Segments.Kubectl.Cluster))) ) (and (.Segments.Contains \"Aws\") (matchP \"prod\" (lower .Segments.Aws.Profile))) }} \uf12a\uf12a\uf12a {{ else }}{{ end }}"
         }
       ]
     },
