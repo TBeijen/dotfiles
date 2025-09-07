@@ -156,6 +156,24 @@ HELP
   fi
 }
 
+aws_eks_kubeconfig() {
+  _show_help "$(cat <<-HELP
+Shows kubeconfig for arg1, replacing the name with arg2. Env will be removed, resulting in always using the active shell aws profile.
+
+Example:
+  aws_eks_kubeconfig some-long-name-non-prod non-prod > my-config
+HELP
+  )" 1 "$@" || return 0
+
+  local cluster="$1"
+  local short="$2"
+
+  aws eks update-kubeconfig --dry-run --name "$cluster" --alias "$short" | \
+    yq 'del(.users[].user.exec.env)' 
+    # | \
+    # yq ".clusters[].name = \"$short\""
+}
+
 aws_sso_to_iam() {
   _show_help "$(cat <<-HELP
     Use cached SSO credentials to obtain AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_SESSION_TOKEN for the currently active profile. Returns json wrapped in 'roleCredentials'.

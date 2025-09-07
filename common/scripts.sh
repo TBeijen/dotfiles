@@ -79,3 +79,9 @@ HELP
   )
 }
 
+# Git command specific for DPG, using the SSH key needed for DPG GitHub organization.
+# Only needed for initial clone, after clone, the gitconfig IncludeIf gitdir, will accomplish the same:
+# Using the dpg ssh key without first trying the default, which GitHub will happily accept, but then deny access to the org repo.
+git_dpg() {
+  GIT_SSH_COMMAND='ssh -o IdentityAgent=none -o IdentitiesOnly=yes -i ~/.ssh/dpg_id_ed25519' git "$@"
+}
