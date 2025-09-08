@@ -53,6 +53,18 @@
           ]
         },
         {
+          "background": "p:bg_grey",
+          "foreground": "p:white",
+          "properties": {
+            "time_format": "15:04 | Mon"
+          },
+          "style": "diamond",
+          "leading_diamond": "<transparent,p:bg_grey>\ue0b0</>",
+          "trailing_diamond": "\ue0b0",
+          "template": "\uf017 {{ .CurrentDate | date .Format }} ",
+          "type": "time"
+        },
+        {
           "type": "aws",
           "properties": {
             "display_default": false
@@ -163,23 +175,24 @@
           "template": "{{ if or (and (.Segments.Contains \"Kubectl\") (matchP \"prod\" (lower .Segments.Kubectl.Cluster)) (not (matchP \"-non-prod\" (lower .Segments.Kubectl.Cluster))) ) (and (.Segments.Contains \"Aws\") (matchP \"prod\" (lower .Segments.Aws.Profile))) }} \uf12a\uf12a\uf12a {{ else }}{{ end }}"
         }
       ]
-    },
-    {
-      "segments": [
-        {
-          "background": "p:bg_grey",
-          "foreground": "p:white",
-          "properties": {
-            "time_format": "15:04:05 | Monday"
-          },
-          "style": "diamond",
-          "leading_diamond": "\ue0c5",
-          "template": "\uf017 {{ .CurrentDate | date .Format }} ",
-          "type": "time"
-        }
-      ],
-      "type": "rprompt"
     }
+    // },
+    // {
+    //   "segments": [
+    //     {
+    //       "background": "p:bg_grey",
+    //       "foreground": "p:white",
+    //       "properties": {
+    //         "time_format": "15:04 | Mon"
+    //       },
+    //       "style": "diamond",
+    //       "leading_diamond": "\ue0c5",
+    //       "template": "\uf017 {{ .CurrentDate | date .Format }} ",
+    //       "type": "time"
+    //     }
+    //   ],
+    //   "type": "rprompt"
+    // }
   ],
   "version": 3,
   "final_space": true
