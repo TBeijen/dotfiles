@@ -4,7 +4,7 @@
 ssh-add -A 2>/dev/null
 
 # Adding path
-PATH="/opt/homebrew/opt/curl/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin"
+PATH="/opt/homebrew/opt/curl/bin:$HOME/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
@@ -21,6 +21,9 @@ unset PYENV_SHELL
 export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 
 export GPG_TTY=$(tty)
+
+# Enable zscaler-enabled bundle for common cli tools
+zscaler_bundle_on
 
 # tailscale
 alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
