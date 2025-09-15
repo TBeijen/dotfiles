@@ -78,6 +78,9 @@ ZSH_CUSTOM="$HOME/dotfiles/zsh"
 # plugins=(aws kube-ps1 virtualenv git)
 plugins=(azure kubectl)
 
+# JSM changes owning user of e.g. docker autocomplete to _jsm, zsh starts to complain
+ZSH_DISABLE_COMPFIX="true"
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
