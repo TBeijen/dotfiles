@@ -85,3 +85,45 @@ HELP
 git_dpg() {
   GIT_SSH_COMMAND='ssh -o IdentityAgent=none -o IdentitiesOnly=yes -i ~/.ssh/dpg_id_ed25519' git "$@"
 }
+
+# Convert markdown to rich text and copy to clipboard.
+# Use case: Shitty Jira that is not configured to accept markdown, but does accept rich text from clipboard.
+#
+# Source: https://www.samuelliedtke.com/blog/til-convert-markdown-to-rich-text-and-copy-to-clipboard-on-macos (adapted with ChatGPT)
+function md2pb() {
+  emulate -L zsh
+  set -o pipefail
+
+  # Read input: from stdin if piped, else from first arg
+  local md
+  if [[ -t 0 ]]; then
+    if [[ $# -eq 0 ]]; then
+      echo "Usage: md2pb [markdown-file]  (or: cat file.md | md2pb)" >&2
+      return 64
+    fi
+    md=$(cat -- "$1") || return $?
+  else
+    md=$(cat) || return $?
+  fi
+
+  # Check deps
+  for cmd in pandoc osascript hexdump; do
+    command -v "$cmd" >/dev/null || { echo "md2pb: missing dependency: $cmd" >&2; return 127; }
+  done
+
+  # Markdown -> HTML fragment (GitHub-flavored + smart punctuation)
+  local html hex
+  html=$(printf '%s' "$md" | pandoc -f gfm+smart -t html) || return $?
+
+  # Hex-encode for AppleScript's «data HTML…» literal
+  hex=$(printf '%s' "$html" | hexdump -ve '1/1 "%.2x"') || return $?
+
+  # Markdown -> Plain text (smart punctuation)
+  local plain
+  plain=$(printf '%s' "$md" | pandoc -f gfm+smart -t plain) || return $?
+  # Escape double quotes for AppleScript
+  plain=${plain//\"/\\\"}
+
+  # Set clipboard with both plain text and rich HTML flavors
+  printf 'set the clipboard to {text:"%s", «class HTML»:«data HTML%s»}\n' "$plain" "$hex" | osascript - >/dev/null
+}

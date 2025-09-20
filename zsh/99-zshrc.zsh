@@ -4,7 +4,7 @@
 ssh-add -A 2>/dev/null
 
 # Adding path
-PATH="/opt/homebrew/opt/curl/bin:$HOME/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin"
+PATH="/opt/homebrew/opt/curl/bin:$HOME/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin:/opt/podman/bin"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
