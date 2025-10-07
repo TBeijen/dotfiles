@@ -101,25 +101,37 @@ Show all images in namespace or all namespaces, as defined in various k8s object
 
 Example:
   kube_all_images ns1 ns2
+  kube_all_images -A
 HELP
   )" 1 "$@" || return 0
 
 	local namespaces=("$@")
 
+	# Check if first argument is -A for all namespaces
+	if [[ "$1" == "-A" ]]; then
+		namespaces=("-A")
+	fi
+
 	for ns in $namespaces; do
-	  echo "Namespace: $ns"
-	  kubectl get deployments,statefulsets,daemonsets,cronjobs,jobs,replicasets -o json -n $ns | \
-	  jq -r --arg ns "$ns" '.items[] |
-	    .metadata.name as $name |
-	    .kind as $kind |
-	    (.spec.template.spec.initContainers[]? |
-	      "\($ns): \($kind)/\($name) - spec.template.spec.initContainers[].image = \(.image)"),
-	    (.spec.template.spec.containers[]? |
-	      "\($ns): \($kind)/\($name) - spec.template.spec.containers[].image = \(.image)"),
-	    (.spec.jobTemplate.spec.template.spec.initContainers[]? |
-	      "\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.initContainers[].image = \(.image)"),
-	    (.spec.jobTemplate.spec.template.spec.containers[]? |
-	      "\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.containers[].image = \(.image)")'
+		if [[ "$ns" == "-A" ]]; then
+			NS_ARG="--all-namespaces"
+		else
+			NS_ARG="-n $ns"
+		fi
+
+		kubectl get deployments,statefulsets,daemonsets,cronjobs,jobs,replicasets -o json $NS_ARG | \
+		jq -r '.items[] |
+			.metadata.name as $name |
+			.metadata.namespace as $ns |
+			.kind as $kind |
+			(.spec.template.spec.initContainers[]? |
+				"\($ns): \($kind)/\($name) - spec.template.spec.initContainers[].image = \(.image)"),
+			(.spec.template.spec.containers[]? |
+				"\($ns): \($kind)/\($name) - spec.template.spec.containers[].image = \(.image)"),
+			(.spec.jobTemplate.spec.template.spec.initContainers[]? |
+				"\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.initContainers[].image = \(.image)"),
+			(.spec.jobTemplate.spec.template.spec.containers[]? |
+				"\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.containers[].image = \(.image)")'
 	done
 }
 
