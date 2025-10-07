@@ -131,7 +131,8 @@ HELP
 			(.spec.jobTemplate.spec.template.spec.initContainers[]? |
 				"\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.initContainers[].image = \(.image)"),
 			(.spec.jobTemplate.spec.template.spec.containers[]? |
-				"\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.containers[].image = \(.image)")'
+				"\($ns): \($kind)/\($name) - spec.jobTemplate.spec.template.spec.containers[].image = \(.image)")' | \
+		sort
 	done
 }
 
