@@ -108,3 +108,12 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+. "$HOME/.local/bin/env"
+# Created by the Docker postinstall script on 2025-11-03 15:10:01
+export PATH="$PATH:$HOME/.docker/bin"
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/tbeijen01/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+

@@ -10,7 +10,7 @@ if [[ -f "$HOME/.env" ]]; then
 fi
 
 # Adding path
-PATH="/opt/homebrew/opt/curl/bin:$HOME/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin:/opt/podman/bin"
+PATH="/opt/homebrew/opt/curl/bin:/opt/homebrew/opt/libpq/bin:$HOME/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin:/opt/podman/bin"
 
 # nvm
 export NVM_DIR="$HOME/.nvm"
@@ -49,7 +49,7 @@ export CUADF=(-H "x-dpgm-akdebug-unhide: $DPG_AKAMAI_UNHIDE" -H "pragma: akamai-
 # shortcuts end
 
 # pnpm
-export PNPM_HOME="/Users/tibobeijen/Library/pnpm"
+export PNPM_HOME="/Users/tbeijen01/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
