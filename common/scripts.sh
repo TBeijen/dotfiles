@@ -129,82 +129,78 @@ function md2pb() {
 }
 
 aws-logins() {
-  emulate -L zsh
-  setopt pipefail
-
-  _have() { command -v "$1" >/dev/null 2>&1 }
-  _info() { print -r -- "==> $*" }
-  _warn() { print -r -- "WARN: $*" >&2 }
-  _err()  { print -r -- "ERROR: $*" >&2; return 1 }
-
-  if ! _have aws; then _err "aws CLI not found"; return 1; fi
-
-  # Use the currently "active" profile just to (re)establish SSO session.
-  local base_profile="${AWS_PROFILE:-default}"
-
-  # Hardcoded targets (entries-only).
-  # Format: "account_id|region"
-  # Registry URL is derived as: <account>.dkr.ecr.<region>.amazonaws.com
-  local -a entries=(
-    "952653322924|eu-west-1"
-    # add more later:
-    # "034859948244|eu-west-1"
-  )
-
-  # podman machine sanity (mostly macOS/Windows)
-  if _have podman && podman machine list >/dev/null 2>&1; then
-    if ! podman machine list 2>/dev/null | grep -qiE 'Running'; then
-      _info "podman machine not running; attempting to start..."
-      podman machine start >/dev/null 2>&1 || _warn "Could not start podman machine (maybe not needed)."
+  # Configuration
+  local AWS_REGION="${AWS_REGION:-eu-west-1}"
+  local ECR_REGISTRY="${1:-952653322924.dkr.ecr.eu-west-1.amazonaws.com}"
+  
+  echo "🔐 Starting AWS ECR login process..."
+  
+  # Step 1: Check if AWS SSO session is still valid
+  echo "\n📝 Step 1: Checking AWS SSO session"
+  if aws sts get-caller-identity &> /dev/null; then
+    echo "✅ AWS SSO session is still valid"
+  else
+    echo "⚠️  AWS SSO session expired or not authenticated"
+    echo "🌐 Opening browser for SSO login..."
+    if ! aws sso login; then
+      echo "❌ AWS SSO login failed"
+      return 1
     fi
+    echo "✅ AWS SSO login successful"
   fi
-
-  _info "aws sso login (profile: $base_profile)..."
-  aws --profile "$base_profile" sso login || return 1
-
-  local entry account region registry pw
-  for entry in "${entries[@]}"; do
-    account="${entry%%|*}"
-    region="${entry##*|}"
-
-    if [[ -z "$account" || -z "$region" || "$account" == "$region" ]]; then
-      _err "Bad entry '${entry}'. Expected 'account_id|region'."
-      return 1
-    fi
-
-    registry="${account}.dkr.ecr.${region}.amazonaws.com"
-
-    _info "ECR target: $registry"
-
-    # Critical bit: use --registry-ids so we can fetch a token for that account's ECR
-    # while staying on the base SSO profile/session.
-    pw="$(aws --profile "$base_profile" ecr get-login-password --region "$region" --registry-ids "$account")" || return 1
-    if [[ -z "$pw" ]]; then
-      _err "Empty ECR password for account $account in region $region"
-      return 1
-    fi
-
-    if _have helm; then
-      _info "helm registry login..."
-      print -r -- "$pw" | helm registry login --username AWS --password-stdin "$registry" || return 1
+  
+  # Get ECR password
+  echo "\n🔑 Retrieving ECR credentials..."
+  local ECR_PASSWORD
+  ECR_PASSWORD=$(aws ecr get-login-password --region "$AWS_REGION")
+  
+  if [ -z "$ECR_PASSWORD" ]; then
+    echo "❌ Failed to retrieve ECR password"
+    return 1
+  fi
+  
+  # Step 2: Helm registry login
+  echo "\n📦 Step 2: Helm registry login"
+  if echo "$ECR_PASSWORD" | helm registry login \
+      --username AWS \
+      --password-stdin "$ECR_REGISTRY"; then
+    echo "✅ Helm registry login successful"
+  else
+    echo "⚠️  Helm registry login failed"
+  fi
+  
+  # Step 3: Skopeo login
+  echo "\n🐙 Step 3: Skopeo login"
+  if echo "$ECR_PASSWORD" | skopeo login \
+      --username AWS \
+      --password-stdin "$ECR_REGISTRY"; then
+    echo "✅ Skopeo login successful"
+  else
+    echo "⚠️  Skopeo login failed"
+  fi
+  
+  # Step 4: Podman login
+  echo "\n🦭 Step 4: Podman login"
+  
+  # Check if podman machine is running
+  if command -v podman &> /dev/null; then
+    if podman machine list 2>/dev/null | grep -q "Currently running"; then
+      echo "✓ Podman machine is running"
     else
-      _warn "helm not found; skipping"
+      echo "⚠️  Podman machine is not running. Starting it..."
+      podman machine start
     fi
-
-    if _have skopeo; then
-      _info "skopeo login..."
-      print -r -- "$pw" | skopeo login --username AWS --password-stdin "$registry" || return 1
+    
+    if echo "$ECR_PASSWORD" | podman login \
+        --username AWS \
+        --password-stdin "$ECR_REGISTRY"; then
+      echo "✅ Podman login successful"
     else
-      _warn "skopeo not found; skipping"
+      echo "⚠️  Podman login failed"
     fi
-
-    if _have podman; then
-      _info "podman login..."
-      print -r -- "$pw" | podman login --username AWS --password-stdin "$registry" || return 1
-    else
-      _warn "podman not found; skipping"
-    fi
-  done
-
-  _info "Done."
+  else
+    echo "⚠️  Podman not found, skipping..."
+  fi
+  
+  echo "\n✨ AWS ECR login process completed!"
 }
