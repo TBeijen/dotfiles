@@ -127,3 +127,84 @@ function md2pb() {
   # Set clipboard with both plain text and rich HTML flavors
   printf 'set the clipboard to {text:"%s", «class HTML»:«data HTML%s»}\n' "$plain" "$hex" | osascript - >/dev/null
 }
+
+aws-logins() {
+  emulate -L zsh
+  setopt pipefail
+
+  _have() { command -v "$1" >/dev/null 2>&1 }
+  _info() { print -r -- "==> $*" }
+  _warn() { print -r -- "WARN: $*" >&2 }
+  _err()  { print -r -- "ERROR: $*" >&2; return 1 }
+
+  if ! _have aws; then _err "aws CLI not found"; return 1; fi
+
+  # Use the currently "active" profile just to (re)establish SSO session.
+  local base_profile="${AWS_PROFILE:-default}"
+
+  # Hardcoded targets (entries-only).
+  # Format: "account_id|region"
+  # Registry URL is derived as: <account>.dkr.ecr.<region>.amazonaws.com
+  local -a entries=(
+    "952653322924|eu-west-1"
+    # add more later:
+    # "034859948244|eu-west-1"
+  )
+
+  # podman machine sanity (mostly macOS/Windows)
+  if _have podman && podman machine list >/dev/null 2>&1; then
+    if ! podman machine list 2>/dev/null | grep -qiE 'Running'; then
+      _info "podman machine not running; attempting to start..."
+      podman machine start >/dev/null 2>&1 || _warn "Could not start podman machine (maybe not needed)."
+    fi
+  fi
+
+  _info "aws sso login (profile: $base_profile)..."
+  aws --profile "$base_profile" sso login || return 1
+
+  local entry account region registry pw
+  for entry in "${entries[@]}"; do
+    account="${entry%%|*}"
+    region="${entry##*|}"
+
+    if [[ -z "$account" || -z "$region" || "$account" == "$region" ]]; then
+      _err "Bad entry '${entry}'. Expected 'account_id|region'."
+      return 1
+    fi
+
+    registry="${account}.dkr.ecr.${region}.amazonaws.com"
+
+    _info "ECR target: $registry"
+
+    # Critical bit: use --registry-ids so we can fetch a token for that account's ECR
+    # while staying on the base SSO profile/session.
+    pw="$(aws --profile "$base_profile" ecr get-login-password --region "$region" --registry-ids "$account")" || return 1
+    if [[ -z "$pw" ]]; then
+      _err "Empty ECR password for account $account in region $region"
+      return 1
+    fi
+
+    if _have helm; then
+      _info "helm registry login..."
+      print -r -- "$pw" | helm registry login --username AWS --password-stdin "$registry" || return 1
+    else
+      _warn "helm not found; skipping"
+    fi
+
+    if _have skopeo; then
+      _info "skopeo login..."
+      print -r -- "$pw" | skopeo login --username AWS --password-stdin "$registry" || return 1
+    else
+      _warn "skopeo not found; skipping"
+    fi
+
+    if _have podman; then
+      _info "podman login..."
+      print -r -- "$pw" | podman login --username AWS --password-stdin "$registry" || return 1
+    else
+      _warn "podman not found; skipping"
+    fi
+  done
+
+  _info "Done."
+}
