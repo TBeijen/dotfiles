@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Profile (comment to disable)
-zmodload zsh/zprof
+# zmodload zsh/zprof
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -79,7 +79,7 @@ ZSH_CUSTOM="$HOME/dotfiles/zsh"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 # plugins=(aws kube-ps1 virtualenv git)
-plugins=(azure kubectl)
+plugins=(kubectl)
 
 # JSM changes owning user of e.g. docker autocomplete to _jsm, zsh starts to complain
 ZSH_DISABLE_COMPFIX="true"
@@ -121,4 +121,4 @@ export PATH="/Users/tbeijen01/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
 
 # Profile end (comment to disable)
-zprof
+# zprof
