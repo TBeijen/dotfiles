@@ -1,0 +1,4 @@
+# Reference this file from actual config file (~/.config/ghostty/config), e.g.
+#   config-file = ../../dotfiles/.config/ghostty/config
+
+theme = dark:Iceberg Dark,light:Iceberg Light
