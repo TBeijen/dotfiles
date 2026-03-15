@@ -12,11 +12,6 @@ fi
 # Adding path
 PATH="/opt/homebrew/opt/curl/bin:/opt/homebrew/opt/libpq/bin:$HOME/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin:/opt/podman/bin"
 
-# nvm
-export NVM_DIR="$HOME/.nvm"
-  [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
-
 # pyenv
 eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
@@ -34,10 +29,26 @@ zscaler_bundle_on
 # tailscale
 alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
-# nvm
+# nvm: Lazy-loaded to avoid ~1.8s shell startup penalty.
+# Stub functions for nvm/node/npm/npx trigger the real nvm load on first use.
+# To revert to eager loading, replace the lazy-load block below with:
+#
+#   export NVM_DIR="$HOME/.nvm"
+#   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+#   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+#
+# Note: eager loading enables automatic .nvmrc switching on cd, but adds ~600ms+
+# to every shell startup.
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+_load_nvm() {
+  unfunction nvm node npm npx 2>/dev/null
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+}
+nvm()  { _load_nvm; nvm "$@" }
+node() { _load_nvm; node "$@" }
+npm()  { _load_nvm; npm "$@" }
+npx()  { _load_nvm; npx "$@" }
 
 # shortcuts
 # CUHD: CUrl Header Dump (array, expanded into multiple args, not a single arg)
