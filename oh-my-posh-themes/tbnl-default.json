@@ -136,7 +136,7 @@
           },
           "leading_diamond": "<transparent,p:bg_grey>\ue0b0</>",
           "trailing_diamond": "<transparent>\ue0bd</>",
-          "template": "{{ if .UpstreamURL }}{{ url .UpstreamIcon .UpstreamURL }} {{ end }}{{ .HEAD }}",
+          "template": "{{ if .UpstreamURL }}{{ url .UpstreamIcon .UpstreamURL }} {{ end }}{{ substr 0 3 .HEAD }} {{ substr 3 25 .HEAD }} ",
           "foreground": "p:dark_slate_grey",
           "powerline_symbol": "\ue0b0",
           "background": "p:bg_grey",
