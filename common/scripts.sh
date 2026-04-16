@@ -202,5 +202,19 @@ aws-logins() {
     echo "⚠️  Podman not found, skipping..."
   fi
   
+  # Step 5: Crane login
+  echo "\n🏗️  Step 5: Crane login"
+  if command -v crane &> /dev/null; then
+    if echo "$ECR_PASSWORD" | crane auth login \
+        --username AWS \
+        --password-stdin "$ECR_REGISTRY"; then
+      echo "✅ Crane login successful"
+    else
+      echo "⚠️  Crane login failed"
+    fi
+  else
+    echo "⚠️  Crane not found, skipping..."
+  fi
+  
   echo "\n✨ AWS ECR login process completed!"
 }
