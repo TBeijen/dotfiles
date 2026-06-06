@@ -228,6 +228,24 @@ style = "bold green"
 - Zscaler CA bundle mounted read-only from host
 - starship prompt shows sandbox indicator (detects `/.dockerenv` or `DEVCONTAINER`)
 
+## References
+
+**chezmoi + mise + devcontainers:**
+- [Reproducible Dev Environment: chezmoi, mise, devcontainers, omnictl](https://medium.com/@pedrotychang/my-reproducible-developer-environment-chezmoi-mise-devcontainers-omnictl-aa27740a0acf) — Shows how chezmoi bootstraps mise via `run_once` scripts, mise config layering (global/project/`MISE_ENV`), and starship prompt for container context. Chezmoi can download mise binary inside containers during image build.
+
+**Podman + devcontainers:**
+- [Running Dev Containers Locally with Podman](https://geekingoutpodcast.substack.com/p/running-dev-containers-locally-with) — VSCode setting `"dev.containers.dockerPath": "podman"`, `"PODMAN_USERNS": "keep-id"` in `remoteEnv` for correct file ownership. Default Podman machine memory (2GB) is too low — increase it.
+
+**Persistence across devcontainer rebuilds:**
+- [Persist Zsh History in Devcontainers](https://gavinest.com/posts/devcontainers-persist-zsh-history/) — Named volumes survive rebuilds. Key gotcha: chezmoi apply overwrites `.zshrc` modifications from Dockerfile — use `postCreateCommand` for fixups that must survive dotfile application.
+- [Persist Claude Across Rebuilds](https://www.eke.li/vscode/2026/03/14/persist-claude-across-rebuilds.html) — Named volume + symlink pattern for `~/.claude/` and `~/.claude.json`. `postCreateCommand` recreates symlinks after each rebuild.
+
+**Cross-cutting patterns for Phase 7:**
+1. Lifecycle ordering: chezmoi apply first, then mise install, then fixup scripts
+2. Named volumes for: zsh history, Claude auth, mise cache (`~/.local/share/mise`)
+3. Podman-specific: `dockerPath`, `PODMAN_USERNS`, memory increase
+4. `postCreateCommand` is the safe place for post-dotfiles fixups
+
 ## Verification at Each Phase
 
 | Phase | How to verify |
