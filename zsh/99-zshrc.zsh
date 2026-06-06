@@ -83,3 +83,9 @@ if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
   eval "$(oh-my-posh init zsh --config "$HOME/dotfiles/oh-my-posh-themes/tbnl-default.json")"
 fi
 # oh-my-posh end
+
+# cargo
+if [[ -f "$HOME/.cargo/env" ]]; then
+  source "$HOME/.cargo/env"
+fi
+# cargo end
