@@ -357,12 +357,13 @@ Devcontainers are **scoped per project folder**. Config lives in `.devcontainer/
 Rule: if you need it after rebuild, it goes in the Dockerfile or on a named volume.
 
 ### Key design points
-- Base devcontainer includes mise + fnox + chezmoi
+- Base devcontainer includes mise + fnox client + chezmoi
 - `chezmoi init --apply` in `postCreateCommand` deploys dotfiles (machine_type=devcontainer)
-- Credentials come from fnox MCP on host, exposed via socket
+- **Default credentials** (read-only) come from fnox MCP on host via forwarded socket — auto-refresh on expiry
+- **Elevated credentials** require out-of-band approval on host — TTL-bounded, never permanent
 - Container never sees SSO tokens, keychain, or host SSH keys
 - Zscaler CA bundle mounted read-only from host
-- starship prompt shows sandbox indicator (detects `/.dockerenv` or `DEVCONTAINER`)
+- starship prompt shows sandbox indicator + elevation warning when admin creds active
 
 ### Credential model in devcontainers
 
@@ -390,6 +391,64 @@ Rule: if you need it after rebuild, it goes in the Dockerfile or on a named volu
   }
 }
 ```
+
+### Credential lifecycle in devcontainers
+
+Devcontainer credentials are short-lived by design. Two flows need to work:
+
+**1. Default credential refresh (automatic)**
+
+Default credentials (read-only AWS, scoped GitHub PAT) are injected via fnox MCP server running on the host, exposed to the container via a forwarded Unix socket. When credentials expire, the container requests fresh ones from fnox MCP — fnox on the host uses the host's SSO session to obtain new STS credentials. This is transparent to the user.
+
+```
+Container                    Host
+   |                          |
+   |-- fnox MCP: get creds -->|
+   |                          |-- aws sts assume-role (ro) -->  AWS
+   |                          |<-- STS session (15m TTL) ------
+   |<-- creds (15m TTL) ------|
+   |                          |
+   | ... 15 min later ...     |
+   |                          |
+   |-- fnox MCP: get creds -->|  (automatic refresh)
+   |<-- fresh creds ----------|
+```
+
+If the host's SSO session itself expires, the user re-authenticates on the host (`aws sso login`). The container never touches SSO.
+
+**2. Credential elevation (out-of-band approval)**
+
+When you need admin/write access from inside the devcontainer (e.g., `terraform apply`, `kubectl delete`), you trigger elevation from the **host** — the container cannot self-elevate.
+
+**Near-term approach (host-side script):**
+```bash
+# Run on HOST terminal — not inside the container
+elevate tbnl dev 15m
+```
+
+This script:
+1. Uses fnox on the host to obtain admin-role STS credentials (requires host SSO session)
+2. Writes credentials to a shared volume mounted into the container (e.g., `/tmp/elevated-creds/`)
+3. Credentials have a 15-minute TTL enforced by AWS STS
+4. Inside the container, a helper sources the elevated creds: `source /tmp/elevated-creds/env`
+5. After TTL expires, the credentials are invalid regardless of whether the file remains
+
+**Target approach (fnox MCP with approval):**
+fnox MCP server supports approval flows. The container (or an LLM agent) requests admin credentials via MCP. fnox on the host prompts for approval — e.g., a terminal prompt, Touch ID, or a notification. Only after explicit host-side approval does fnox issue the elevated credentials with a TTL.
+
+```
+Container                    Host
+   |                          |
+   |-- fnox MCP: elevate ---->|
+   |                          |-- prompt: "Allow admin for tbnl/dev? [y/N]"
+   |                          |<-- user approves
+   |                          |-- aws sts assume-role (admin) --> AWS
+   |<-- admin creds (15m) ----|
+```
+
+This keeps the security invariant: **the container cannot obtain elevated credentials without explicit human approval on the host.**
+
+**Starship prompt integration:** When elevated credentials are active, the starship prompt shows a warning segment (e.g., red `ELEVATED` badge). When they expire, the badge disappears automatically.
 
 ### Podman-specific
 - VSCode setting: `"dev.containers.dockerPath": "podman"`
@@ -425,6 +484,7 @@ Rule: if you need it after rebuild, it goes in the Dockerfile or on a named volu
 | 4 | `fnox get gh_token` works; `printenv \| grep AKAMAI` shows nothing; `fnox exec -- aws sts get-caller-identity` returns expected role |
 | 5 | `sw tbnl dev-ro d` activates fnox credentials + sets KUBECONFIG; `sw-admin` warns and spawns TTL subshell |
 | 6 | Inside nono: `printenv \| grep AWS` shows nothing; Claude can request read-only creds via MCP |
+| 7 | In devcontainer: `aws sts get-caller-identity` returns read-only role; creds refresh after expiry; `elevate` on host injects admin creds that expire after TTL |
 
 ## Implementation Order & Dependencies
 
