@@ -1,0 +1,46 @@
+[user]
+	name = Tibo Beijen
+	email = tibobeijen@gmail.com
+	signingkey = 058FED1DA5DDA152
+
+[commit]
+	gpgsign = true
+	# template = /Users/tibobeijen/.stCommitMsg
+
+[includeIf "gitdir:~/projects/dhl/"]
+	path = ~/.gitconfig-dhl
+
+[includeIf "gitdir:~/projects/dpg/"]
+	path = ~/.gitconfig-dpg
+
+[core]
+	excludesfile = {{ .chezmoi.homeDir }}/.gitignore_global
+
+[init]
+	defaultBranch = main
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[push]
+        default = matching
+
+[merge]
+        ff = false
+
+[pull]
+        ff = only
+
+[alias]
+        # Inline formatted log, including branches. Example: 'git l', 'git l 5'
+        l = "!f() { LESS="-FXR" git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(yellow)%h%C(reset) %C(green)(%ar)%C(reset) - %C(cyan)%an%C(reset) - %C(white)%aD%C(reset) -%C(bold red)%d%C(reset) %C(dim white)%s%C(reset)' -n${1:-1}; }; f"
+
+    lot = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(yellow)%h%C(reset) %C(green)(%ar)%C(reset) - %C(cyan)%an%C(reset) - %C(white)%aD%C(reset) -%C(bold red)%d%C(reset) %C(dim white)%s%C(reset)' --all
+    hist = log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short
+        # See: https://coderwall.com/p/6l2paq/show-merged-and-unmerged-branches-in-git
+    unmerged = !git branch -r --no-merged | grep -v -e HEAD -e develop -e master | xargs -L1 git --no-pager log --pretty=tformat:'%Cgreen%d%Creset - %h by %an (%Cblue%ar%Creset)' -1
+    merged = !git branch -r --merged | grep -v -e HEAD -e develop -e master | xargs -L1 git --no-pager log --pretty=tformat:'%Cgreen%d%Creset - %h by %an (%Cblue%ar%Creset)' -1%
+
