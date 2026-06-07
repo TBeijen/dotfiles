@@ -1,0 +1,7 @@
+[user]
+  name = Tibo Beijen
+  email = tibo.beijen1@persgroep.net
+  signingkey = 07C8DFE42DC418B4
+
+[core]
+  sshCommand = ssh -o IdentityAgent=none -o IdentitiesOnly=yes -i ~/.ssh/dpg_id_ed25519
