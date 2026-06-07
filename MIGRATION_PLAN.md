@@ -14,8 +14,10 @@
 |------|----------|--------|---------|
 | **New dotfiles** (chezmoi) | `~/.local/share/chezmoi/` | `codeberg.org/TBeijen/dotfiles` | All new dotfile management |
 | **Old dotfiles** | `~/dotfiles/` | `github.com/TBeijen/dotfiles` | Current setup, becomes archive |
+| **Ansible playbook** | `~/ansible-osx/` | `github.com/TBeijen/ansible-osx` | Current macOS bootstrap, absorbed by chezmoi+mise |
+| **SSH config** | `~/ssh_config/` | `codeberg.org/TBeijen/ssh_config` | SSH config, fold into chezmoi |
 
-**Migration path:** Old GitHub repo will be renamed to `dotfiles-archive`. The Codeberg repo becomes the canonical dotfiles source. GitHub auto-redirects the old name temporarily, but nothing should depend on it long-term.
+**Migration path:** Old GitHub dotfiles repo will be renamed to `dotfiles-archive`. The Codeberg repo becomes the canonical dotfiles source. The Ansible playbook and SSH config repos are absorbed into chezmoi and archived.
 
 ## Tools
 
@@ -38,36 +40,110 @@
 
 ## Phase 1: chezmoi — Dotfile Management
 
-**Goal:** Bring all dotfiles under declarative management in the new chezmoi repo. No behavioral change — same files, same locations, just managed by chezmoi instead of manual symlinks/includes.
+**Goal:** Bring all dotfiles under declarative management in the new chezmoi repo. No behavioral change — same files, same locations, just managed by chezmoi instead of manual symlinks/includes. Also absorb the Ansible playbook's bootstrap responsibilities.
 
-**What chezmoi replaces:** The manual setup where `~/.gitconfig` has `[include] path = dotfiles/common/.gitconfig`, `ZSH_CUSTOM` points to `~/dotfiles/zsh/`, and Ghostty config uses `config-file` to include from dotfiles.
+**What chezmoi replaces:**
+- The manual symlink setup (`~/.zshrc` -> `~/dotfiles/common/.zshrc`, `~/.ssh/config` -> `~/ssh_config/config`)
+- The `[include]` directive in `~/.gitconfig`
+- The Ansible playbook (`~/ansible-osx/`) for macOS bootstrap
 
 **Current state:** chezmoi initialized, empty repo at `~/.local/share/chezmoi/` with remote on Codeberg.
 
-**Steps:**
-1. `chezmoi add` each managed file: `.zshrc`, `.gitconfig`, `.config/ghostty/config`, `.config/nono/profiles/*.json`, oh-my-posh themes, zsh custom dir
-2. Set up `.chezmoi.toml.tmpl` with OS detection for Mac vs Linux divergences (Homebrew prefix, Zscaler bundle path, pnpm path)
-3. Template the files that differ per-platform (currently only a few: PATH entries, Zscaler bundle)
-4. Verify: `chezmoi diff` shows no drift, `chezmoi apply -n` is a no-op on current machine
-5. Commit and push to Codeberg
+### chezmoi multi-machine model
 
-**Key decision — what goes where:**
-- chezmoi manages files that land in `$HOME` (`.zshrc`, `.gitconfig`, `.config/*`)
-- The zsh custom scripts (`00-scripts.zsh`, `10-aws_scripts.zsh`, etc.) currently live in `~/dotfiles/zsh/` and are sourced via `ZSH_CUSTOM`. These should move into chezmoi so they deploy to a chezmoi-managed location (e.g., `~/.config/zsh-custom/` or keep `~/dotfiles/zsh/` but managed by chezmoi)
+chezmoi uses a data + template system to distinguish machine types. On first `chezmoi init`, it prompts for machine type and stores the answer:
+
+```toml
+# .chezmoi.toml.tmpl
+{{- $machine_type := promptChoiceOnce . "machine_type" "Machine type" (list "workstation" "devcontainer" "server") }}
+
+[data]
+  machine_type = {{ $machine_type | quote }}
+  is_corporate = true
+```
+
+Then `.chezmoiignore` (templated) gates what gets deployed:
+
+```
+{{ if ne .machine_type "workstation" }}
+Brewfile
+run_once_*-brew*.sh
+run_once_*-macos-defaults.sh
+run_once_*-omz.sh
+private_dot_ssh/
+{{ end }}
+
+{{ if ne .chezmoi.os "darwin" }}
+run_once_*-macos-defaults.sh
+{{ end }}
+```
+
+| Layer | Examples | Deployed where |
+|-------|----------|----------------|
+| **Universal dotfiles** | `.zshrc`, `.gitconfig`, `starship.toml`, mise config | Everywhere |
+| **Host bootstrap** | Brewfile, `run_once` scripts, macOS defaults, GPG config | `machine_type == "workstation"` only |
+| **Platform-specific** | Homebrew paths, Zscaler bundle, pnpm path | Gated by `{{ .chezmoi.os }}` |
+
+### Absorbing the Ansible playbook
+
+The Ansible playbook (`~/ansible-osx/osx.yaml`) does 6 things. Here's how each maps to chezmoi + mise:
+
+| Ansible playbook | chezmoi + mise equivalent |
+|---|---|
+| **`osx_brew.yaml`** — installs ~80 brew packages + ~20 casks | **Brewfile** (chezmoi-managed) + `run_once_install-brew-packages.sh` that runs `brew bundle`. Tools that mise manages (node, python, terraform, kubectl, helm) are removed from Brewfile — mise handles them |
+| **`osx_defaults.yaml`** — Finder hidden files, screenshot dir, DS_Store | **`run_once_setup-macos-defaults.sh`** — same `defaults write` commands |
+| **`osx_omz.yaml`** — installs oh-my-zsh | **`run_once_install-omz.sh`** — curls the installer if `~/.oh-my-zsh` missing |
+| **`osx_configure_gnupg.yaml`** — creates `~/.gnupg/`, templates `gpg.conf` + `gpg-agent.conf` | **No longer needed for git signing** — SSH signing replaces GPG. GPG config only needed if GPG is used for other purposes (encryption, etc.) |
+| **`osx_config_repos.yaml`** — clones dotfiles, ssh_config, workspaces repos + creates symlinks | **`chezmoi init --apply`** replaces dotfiles clone. SSH config folded into chezmoi as `private_dot_ssh/`. Workspaces clone in `run_once_setup-workspaces.sh` |
+| **`osx_misc.yaml`** — creates `~/Documents/Screenshots`, nvm dir, autoenv symlink | **`run_once` script** or chezmoi `create_` entries for dirs. autoenv symlink may not be needed if mise environments replace autoenv |
+
+### Git commit signing: SSH signing (replacing GPG)
+
+**Decision: switch to SSH signing everywhere** (host + devcontainers). GPG signing is dropped.
+
+Why SSH signing wins:
+- Git 2.34+ supports `gpg.format = ssh` — signs commits with SSH keys
+- GitHub and Codeberg both support SSH signing keys
+- No GPG daemon, no pinentry, no socket path issues — works identically on Mac and Linux
+- Config is 3 lines in `.gitconfig` (chezmoi deploys everywhere)
+- Enables clean signing-only key separation for devcontainers (see Phase 6)
+- **Key rotation/revocation is safe**: GitHub records verification status at the time of verification, so revoking or rotating a signing key does not retroactively invalidate past commits ([GitHub docs: about commit signature verification](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification))
+
+This eliminates the GPG setup from the Ansible playbook entirely (`osx_configure_gnupg.yaml`, `gpg.conf.tmpl`, `gpg-agent.conf.tmpl`, pinentry-mac config). If GPG is still needed for non-git purposes (e.g., encrypting files), it can be set up separately.
+
+### Steps
+
+1. `chezmoi add` each managed file (follows symlinks, captures actual content):
+   - `.zshrc`, `.gitconfig`, `.config/ghostty/config`
+   - `.config/nono/profiles/*.json`
+   - `.ssh/config` (from ssh_config repo)
+   - zsh custom scripts, oh-my-posh themes
+2. Set up `.chezmoi.toml.tmpl` with OS detection + machine type prompt
+3. Create `.chezmoiignore` to gate host-only content
+4. Create `Brewfile` from Ansible's brew package lists (minus mise-managed tools)
+5. Create `run_once` scripts for bootstrap tasks (brew bundle, oh-my-zsh, macOS defaults, workspaces clone)
+6. Template files that differ per-platform (PATH entries, Zscaler bundle path)
+7. Generate SSH signing key (`ssh-keygen -t ed25519 -f ~/.ssh/id_signing`), register on GitHub/Codeberg as Signing Key only
+8. Verify: `chezmoi diff` shows no drift, `chezmoi apply -n` is a no-op
+9. Commit and push to Codeberg
 
 **What stays outside chezmoi:**
 - `~/workspaces/` tree (its own repos + workspace-specific state)
 - `~/dotfiles/archive/` (historical reference, stays in old repo)
 
-**Fallback:** `chezmoi purge` removes chezmoi management; old `~/dotfiles/` setup still works.
+**Fallback:** `chezmoi purge` removes chezmoi management; old `~/dotfiles/` + Ansible setup still works.
 
 **Files in chezmoi source (`~/.local/share/chezmoi/`):**
-- `.chezmoi.toml.tmpl` — chezmoi data/config with OS detection
-- `.chezmoiignore` — exclude patterns
-- `dot_zshrc` (or `dot_zshrc.tmpl` if templated)
-- `dot_gitconfig`
+- `.chezmoi.toml.tmpl` — machine type, OS detection, corporate flag
+- `.chezmoiignore` — conditional exclusions per machine type / OS
+- `dot_zshrc.tmpl` — templated for platform differences
+- `dot_gitconfig` — with signing config
+- `private_dot_ssh/config` — absorbed from ssh_config repo
 - `dot_config/ghostty/config`
 - `dot_config/nono/profiles/` — nono sandbox profiles
+- `dot_config/mise/config.toml` — global mise config (added in Phase 2)
+- `Brewfile` — brew packages + casks (workstation only)
+- `run_once_*.sh` — bootstrap scripts (conditional per machine type)
 - Zsh custom scripts (structure TBD during implementation)
 
 ## Phase 2: mise — Tool Version Management
@@ -161,6 +237,14 @@ style = "bold green"
 - Secrets are fetched on demand, never written to disk as plaintext
 - Portable across machines (unlike keychain)
 
+**GitHub PATs for fnox (preparation for Phases 6+7):**
+Create fine-grained PATs on GitHub scoped narrowly:
+- **claude-readonly**: `contents: read`, `metadata: read` on specific repos — for LLM agents
+- **claude-push**: `contents: write`, `metadata: read` on specific repos — for LLM push (no admin, no branch protection bypass)
+- **interactive**: broader scope for interactive shell use (or keep using SSH auth key on host)
+
+Store all PATs in Bitwarden, inject via fnox. Each PAT maps to a fnox secret with appropriate `env` setting.
+
 **Fallback:** Re-add `~/.env` sourcing, revert curl shortcuts. fnox secrets stay in Bitwarden regardless.
 
 ## Phase 5: Evolve sw() — Workspace Orchestration
@@ -209,24 +293,108 @@ style = "bold green"
 
 **Credential access matrix:**
 
-| Actor | AWS admin | AWS read-only | GH token | Keychain |
-|-------|-----------|---------------|----------|----------|
-| Interactive shell (default) | No | via sw() + fnox | via fnox get | Yes |
-| Interactive shell (elevated) | via sw-admin (TTL) | Yes | via fnox get | Yes |
-| Claude Code | Never | via fnox MCP (5m TTL) | via fnox MCP (scoped PAT) | Never |
-| npm/pip install | Never | Never | Never | Never |
+| Actor | AWS admin | AWS read-only | GH push | GH read | Git signing | Keychain |
+|-------|-----------|---------------|---------|---------|-------------|----------|
+| Interactive shell (default) | No | via sw() + fnox | SSH auth key | SSH auth key | SSH signing key | Yes |
+| Interactive shell (elevated) | via sw-admin (TTL) | Yes | SSH auth key | SSH auth key | SSH signing key | Yes |
+| Claude Code (host/nono) | Never | via fnox MCP (5m TTL) | scoped PAT via fnox | scoped PAT via fnox | signing key (file) | Never |
+| Claude Code (devcontainer) | Never | via fnox MCP (5m TTL) | scoped PAT via fnox | scoped PAT via fnox | signing key (mounted file) | Never |
+| npm/pip install | Never | Never | Never | Never | Never | Never |
+
+### SSH key separation for signing vs authentication
+
+The host has two SSH keys with distinct GitHub registrations:
+
+| Key | GitHub registration | Can authenticate? | Can sign commits? | Available in devcontainer? |
+|-----|-------------------|-------------------|-------------------|---------------------------|
+| `~/.ssh/id_ed25519` | **Authentication Key** | Yes (full identity) | No | **Never** — not forwarded, not mounted |
+| `~/.ssh/id_signing` | **Signing Key only** | No | Yes | Yes — mounted as read-only file |
+
+**No SSH agent forwarding into devcontainers.** Agent forwarding would expose the auth key. Instead:
+- Signing: via `id_signing` private key file mounted read-only into the container
+- Push/pull: via fine-grained PAT injected by fnox (scoped to specific repos, `contents: write` only, no admin/bypass permissions)
+
+Even if the signing key file is compromised, it can only sign commits (claim authorship) — it cannot authenticate to GitHub for any action.
+
+**Git config (chezmoi-managed, universal):**
+```ini
+[gpg]
+  format = ssh
+[user]
+  signingkey = ~/.ssh/id_signing
+[commit]
+  gpgsign = true
+```
+
+On the host, this works with either the key file directly or via ssh-agent (if loaded). In devcontainers, it uses the mounted file.
+
+### GitHub org hardening (complementary)
+
+Recommend reviewing these org-level settings for defense in depth:
+- **Branch protection: "Do not allow bypassing the above settings"** — prevents even admins from bypassing
+- **Rulesets** (org-level) — enforce protections across all repos, more granular than branch protection
+- **Require approval for fine-grained PATs** — org admin approves before PATs are active against org repos
+- **Audit log alerts** — monitor force pushes, protection changes, PAT creation
 
 ## Phase 7: DevContainers (Future)
 
 **Goal:** Full dev environment isolation. Credential injection scoped per container.
 
-**Deferred until Phases 1-6 are stable.** Key design points:
+**Deferred until Phases 1-6 are stable.**
+
+### Devcontainer scope and lifecycle
+
+Devcontainers are **scoped per project folder**. Config lives in `.devcontainer/devcontainer.json` per project (or `.devcontainer/{name}/devcontainer.json` for multiple configs, e.g., monorepos).
+
+**Rebuild frequency: rare.** You rebuild when Dockerfile or devcontainer.json changes. Day-to-day you keep working in the running container. What matters:
+
+| Survives rebuild | Lost on rebuild |
+|---|---|
+| Source code (bind-mounted from host) | Container filesystem (apt installs, etc.) |
+| Named volumes (zsh history, `~/.claude`, caches) | Anonymous container state |
+| Anything in Dockerfile/features | Ad-hoc changes to running container |
+
+Rule: if you need it after rebuild, it goes in the Dockerfile or on a named volume.
+
+### Key design points
 - Base devcontainer includes mise + fnox + chezmoi
-- `chezmoi init --apply` in `postCreateCommand` deploys dotfiles
+- `chezmoi init --apply` in `postCreateCommand` deploys dotfiles (machine_type=devcontainer)
 - Credentials come from fnox MCP on host, exposed via socket
 - Container never sees SSO tokens, keychain, or host SSH keys
 - Zscaler CA bundle mounted read-only from host
 - starship prompt shows sandbox indicator (detects `/.dockerenv` or `DEVCONTAINER`)
+
+### Credential model in devcontainers
+
+**No SSH agent forwarding.** `SSH_AUTH_SOCK` is explicitly cleared in devcontainer config. This prevents the host auth key (`id_ed25519`) from being accessible inside the container.
+
+**Signing:** The signing-only key (`id_signing`) is bind-mounted read-only into the container. Git uses it directly as a file (not via agent). The key is registered on GitHub as a Signing Key only — it cannot authenticate.
+
+**Push/pull:** Fine-grained PAT injected by fnox, used via git credential helper. Scoped to specific repos with `contents: write` only — no admin, no branch protection bypass.
+
+```jsonc
+// devcontainer.json — credential model
+{
+  "mounts": [
+    // Signing key (read-only, cannot authenticate)
+    "source=${localEnv:HOME}/.ssh/id_signing,target=/home/vscode/.ssh/id_signing,type=bind,readonly",
+    "source=${localEnv:HOME}/.ssh/id_signing.pub,target=/home/vscode/.ssh/id_signing.pub,type=bind,readonly",
+    // Zscaler CA bundle
+    "source=${localEnv:HOME}/.zscaler/bundle_combined.pem,target=/etc/ssl/certs/zscaler-bundle.pem,type=bind,readonly"
+  ],
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "",              // clear — no agent forwarding
+    "PODMAN_USERNS": "keep-id",      // correct file ownership
+    "SSL_CERT_FILE": "/etc/ssl/certs/zscaler-bundle.pem",
+    "NODE_EXTRA_CA_CERTS": "/etc/ssl/certs/zscaler-bundle.pem"
+  }
+}
+```
+
+### Podman-specific
+- VSCode setting: `"dev.containers.dockerPath": "podman"`
+- `"PODMAN_USERNS": "keep-id"` in `remoteEnv` for correct file ownership
+- Increase default Podman machine memory beyond 2GB
 
 ## References
 
