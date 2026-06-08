@@ -11,6 +11,8 @@
 
 [includeIf "gitdir:~/projects/dpg/"]
 	path = ~/.gitconfig-dpg
+[includeIf "hasconfig:remote.*.url:git@github.com:DPG-Media*/**"]
+        path = ~/.gitconfig-dpg
 
 [core]
 	excludesfile = ~/.gitignore_global
