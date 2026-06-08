@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "name": "claude-code-tb-broker",
+    "version": "1.0.0",
+    "description": "Claude Code TB profile using credential broker (experimental)"
+  },
+  "extends": "claude-code",
+  "env_credentials": {
+    "apple-password://github.com/nono-dpg-tbeijen-pat-claude": "GH_TOKEN"
+  },
+  "groups": {
+    "include": [
+      "deny_credentials"
+    ]
+  },
+  "filesystem": {
+    "read": [
+      "$HOME/.config/gh",
+      "$HOME/dotfiles"
+    ],
+    "read_file": [
+      "$HOME/.zscaler/bundle_combined.pem",
+      "$HOME/.gitconfig-dpg"
+    ]
+  },
+  "credential_access": [
+    {
+      "provider": "macos-keychain",
+      "classes": ["generic-password"],
+      "operations": ["read", "upsert", "delete"],
+      "service_prefixes": ["claude-"],
+      "accounts": ["*"]
+    },
+    {
+      "provider": "macos-keychain",
+      "classes": ["generic-password"],
+      "operations": ["read"],
+      "services": ["nono"],
+      "accounts": ["*"]
+    }
+  ]
+}

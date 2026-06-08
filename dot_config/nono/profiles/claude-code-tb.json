@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "claude-code-tb",
+    "version": "1.0.0",
+    "description": "Claude Code customization for TB"
+  },
+  "extends": "claude-code-no-keychain",
+  "env_credentials": {
+    "apple-password://github.com/nono-dpg-tbeijen-pat-claude": "GH_TOKEN"
+  },
+  "groups": {
+    "include": [
+      "deny_credentials",
+      "deny_keychains_macos"
+    ]
+  },
+  "filesystem": {
+    "read": [
+      "$HOME/.config/gh",
+      "$HOME/dotfiles"
+    ],
+    "read_file": [
+      "$HOME/.zscaler/bundle_combined.pem",
+      "$HOME/.gitconfig-dpg"
+    ]
+  }
+}

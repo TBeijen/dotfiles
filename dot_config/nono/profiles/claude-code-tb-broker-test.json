@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "name": "claude-code-tb-broker-test",
+    "version": "1.0.0",
+    "description": "Credential broker test profile — allows only nono-broker-test-allowed service"
+  },
+  "extends": "claude-code",
+  "groups": {
+    "include": [
+      "deny_credentials"
+    ]
+  },
+  "filesystem": {
+    "read": [
+      "$HOME/.config/gh",
+      "$HOME/dotfiles"
+    ],
+    "read_file": [
+      "$HOME/.zscaler/bundle_combined.pem",
+      "$HOME/.gitconfig-dpg"
+    ]
+  },
+  "credential_access": [
+    {
+      "provider": "macos-keychain",
+      "classes": ["generic-password"],
+      "operations": ["read"],
+      "services": ["nono-broker-test-allowed"],
+      "accounts": ["*"]
+    }
+  ]
+}

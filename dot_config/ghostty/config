@@ -1,0 +1,6 @@
+theme = dark:GitHub Dark Default,light:GitHub Light Default
+
+# See: https://github.com/ghostty-org/ghostty/discussions/3836#discussioncomment-11688264
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = no-cursor
