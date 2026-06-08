@@ -1,10 +1,15 @@
 # Starship prompt — powerline style with tbnl color palette
 # Toggle back to oh-my-posh: export USE_STARSHIP=false
+# Palette hex values: bg_grey_light=#5b64a4, bg_grey=#202237
 
+add_newline = false
+
+# Powerline separator is U+E0B0 ()
+# Using explicit hex in separators (palette names don't resolve there)
 format = """
-[](bg:bg_grey_light)\
+[](fg:#5b64a4)\
 $status\
-[](fg:bg_grey_light bg:bg_grey)\
+[](fg:#5b64a4 bg:#202237)\
 $time\
 $custom\
 $aws\
@@ -15,7 +20,7 @@ $nodejs\
 $directory\
 $git_branch\
 $git_status\
-[](fg:bg_grey)\
+[](fg:#202237)\
 $character"""
 
 palette = "tbnl"
@@ -53,12 +58,14 @@ style = "fg:white bg:bg_grey"
 
 [aws]
 disabled = false
-format = "[  $profile ]($style)"
+format = "[ $symbol$profile ]($style)"
+symbol = " "
 style = "fg:aws_orange bg:bg_grey"
 
 [azure]
 disabled = false
-format = "[  $subscription ]($style)"
+format = "[ $symbol$subscription ]($style)"
+symbol = " "
 style = "fg:azure_blue bg:bg_grey"
 
 [kubernetes]
@@ -75,7 +82,8 @@ disabled = false
 detect_extensions = []
 detect_files = []
 detect_folders = []
-format = "[  $virtualenv ]($style)"
+format = "[ $symbol$virtualenv ]($style)"
+symbol = " "
 style = "fg:gold bg:bg_grey"
 python_binary = ["python3", "python"]
 
@@ -84,7 +92,8 @@ disabled = false
 detect_extensions = []
 detect_files = []
 detect_folders = []
-format = "[  $version ]($style)"
+format = "[ $symbol$version ]($style)"
+symbol = " "
 style = "fg:nodejs_green bg:bg_grey"
 
 [directory]
@@ -95,7 +104,6 @@ truncation_symbol = "…/"
 
 [git_branch]
 format = "[  $branch(:$remote_branch) ]($style)"
-symbol = ""
 style = "fg:dark_slate_grey bg:bg_grey"
 truncation_length = 25
 
