@@ -1,26 +1,24 @@
 # Starship prompt — powerline style with tbnl color palette
 # Toggle back to oh-my-posh: export USE_STARSHIP=false
 # Palette hex values: bg_grey_light=#5b64a4, bg_grey=#202237, terminal_bg=#0d1117 (Ghostty GitHub Dark Default)
-#  = solid right arrow,  = thin right arrow
+#  = solid right arrow U+E0B0,  = thin right arrow U+E0B1
+# Separators are included in each module's format so they hide with the module
 
 add_newline = false
 
+# Only fixed separators remain here: status→time transition, and closing arrow.
+# All thin separators between conditional modules are inside each module's format.
 format = """
 $status\
 [](fg:#5b64a4 bg:#202237)\
 $time\
-[](fg:#0d1117 bg:#202237)\
 $aws\
 $azure\
-[](fg:#0d1117 bg:#202237)\
 $kubernetes\
-[](fg:#0d1117 bg:#202237)\
 $python\
-[](fg:#0d1117 bg:#202237)\
 $nodejs\
 [](fg:#0d1117 bg:#202237)\
 $directory\
-[](fg:#0d1117 bg:#202237)\
 $git_branch\
 $git_status\
 ${custom.prod_warning}\
@@ -61,54 +59,61 @@ format = "[  $time ]($style)"
 time_format = "%H:%M | %a"
 style = "fg:white bg:bg_grey"
 
+# Separator included in format — hides when no AWS profile active
 [aws]
 disabled = false
-format = "[ $symbol$profile ]($style)"
+format = "[](fg:#0d1117 bg:#202237)[ $symbol$profile ]($style)"
 symbol = " "
 style = "fg:aws_orange bg:bg_grey"
 
+# Separator included in format — hides when no Azure subscription active
 [azure]
 disabled = false
-format = "[ $symbol$subscription ]($style)"
+format = "[](fg:#0d1117 bg:#202237)[ $symbol$subscription ]($style)"
 symbol = " "
 style = "fg:azure_blue bg:bg_grey"
 
+# Separator included in format — hides when KUBECONFIG not set
 [kubernetes]
 disabled = false
 detect_env_vars = ["KUBECONFIG"]
 detect_files = []
 detect_folders = []
 detect_extensions = []
-format = "[ ☸ $context( :: $namespace) ]($style)"
+format = "[](fg:#0d1117 bg:#202237)[ ☸ $context( :: $namespace) ]($style)"
 style = "fg:k8s_blue bg:bg_grey"
 
+# Separator included in format — hides when no virtualenv active
 [python]
 disabled = false
 detect_extensions = []
 detect_files = []
 detect_folders = []
-format = "[ $symbol$virtualenv ]($style)"
-symbol = " "
+format = "[](fg:#0d1117 bg:#202237)[ $symbol$virtualenv ]($style)"
+symbol = " "
 style = "fg:gold bg:bg_grey"
 python_binary = ["python3", "python"]
 
+# Separator included in format — hides when no .mise.toml / node project
 [nodejs]
 disabled = false
 detect_extensions = []
 detect_files = []
 detect_folders = []
-format = "[ $symbol$version ]($style)"
-symbol = " "
+format = "[](fg:#0d1117 bg:#202237)[ $symbol$version ]($style)"
+symbol = " "
 style = "fg:nodejs_green bg:bg_grey"
 
+# Directory always shown — fixed separator before it in main format
 [directory]
-format = "[  $path ]($style)"
+format = "[  $path ]($style)"
 style = "fg:cyan bg:bg_grey"
 truncation_length = 3
 truncation_symbol = "…/"
 
+# Separator included in format — hides outside git repos
 [git_branch]
-format = "[  $branch(:$remote_branch) ]($style)"
+format = "[](fg:#0d1117 bg:#202237)[  $branch(:$remote_branch) ]($style)"
 style = "fg:dark_slate_grey bg:bg_grey"
 truncation_length = 25
 
@@ -132,12 +137,12 @@ error_symbol = "[❯](bold red)"
 [custom.sandbox]
 command = "echo sandbox"
 when = '[ -n "$NONO_PROFILE" ] || [ -n "$DEVCONTAINER" ] || [ -f /.dockerenv ]'
-format = "[  $output ]($style)"
+format = "[](fg:#0d1117 bg:#202237)[  $output ]($style)"
 style = "bold fg:green bg:bg_grey"
 
-# Production warning — last segment, matches OMP position
+# Production warning — last segment before closing arrow
 [custom.prod_warning]
 command = "echo '!!!'"
 when = '''case "${AWS_PROFILE:-}${KUBECONFIG:-}" in *non-prod*|*nonprod*) exit 1;; *prod*) exit 0;; *) exit 1;; esac'''
-format = "[ $output ]($style)"
+format = "[](fg:#0d1117 bg:#202237)[ $output ]($style)"
 style = "bold fg:white bg:red_bright"
