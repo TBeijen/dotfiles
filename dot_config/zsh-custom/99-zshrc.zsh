@@ -12,6 +12,14 @@ fi
 # Adding path
 PATH="/opt/homebrew/opt/curl/bin:/opt/homebrew/opt/libpq/bin:$HOME/bin:$HOME/.local/bin/:$HOME/go/bin/:$PATH:$HOME/Library/Python/3.9/bin:/opt/podman/bin"
 
+# Rancher Desktop
+export PATH="$HOME/.rd/bin:$PATH"
+
+# mise
+if command -v mise &>/dev/null; then
+  eval "$(mise activate zsh)"
+fi
+
 # pyenv: Cached init for fast shell startup (~649ms saving).
 # The output of pyenv init is fairly static, so we cache it and regenerate daily.
 # To revert to eager loading, replace this block with:
@@ -20,17 +28,17 @@ PATH="/opt/homebrew/opt/curl/bin:/opt/homebrew/opt/libpq/bin:$HOME/bin:$HOME/.lo
 #   eval "$(pyenv init -)"
 #   eval "$(pyenv virtualenv-init -)"
 #
-_pyenv_cache="$HOME/.cache/pyenv-init.zsh"
-if [[ ! -f "$_pyenv_cache" ]] || [[ $(date -r "$_pyenv_cache" +%s) -lt $(( $(date +%s) - 86400 )) ]]; then
-  mkdir -p "$(dirname "$_pyenv_cache")"
-  { pyenv init --path; pyenv init -; pyenv virtualenv-init - } > "$_pyenv_cache" 2>/dev/null
-fi
-source "$_pyenv_cache"
-unset _pyenv_cache
-unset PYENV_SHELL
-# See: https://github.com/pyenv/pyenv-virtualenv/blob/master/bin/pyenv-sh-activate
-# Avoid entering pyenv dir to prepend venv name to zsh prompt
-export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+## _pyenv_cache="$HOME/.cache/pyenv-init.zsh"
+## if [[ ! -f "$_pyenv_cache" ]] || [[ $(date -r "$_pyenv_cache" +%s) -lt $(( $(date +%s) - 86400 )) ]]; then
+##   mkdir -p "$(dirname "$_pyenv_cache")"
+##   { pyenv init --path; pyenv init -; pyenv virtualenv-init - } > "$_pyenv_cache" 2>/dev/null
+## fi
+## source "$_pyenv_cache"
+## unset _pyenv_cache
+## unset PYENV_SHELL
+## # See: https://github.com/pyenv/pyenv-virtualenv/blob/master/bin/pyenv-sh-activate
+## # Avoid entering pyenv dir to prepend venv name to zsh prompt
+## export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 
 export GPG_TTY=$(tty)
 
@@ -50,16 +58,16 @@ alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 #
 # Note: eager loading enables automatic .nvmrc switching on cd, but adds ~600ms+
 # to every shell startup.
-export NVM_DIR="$HOME/.nvm"
-_load_nvm() {
-  unfunction nvm node npm npx 2>/dev/null
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-}
-nvm()  { _load_nvm; nvm "$@" }
-node() { _load_nvm; node "$@" }
-npm()  { _load_nvm; npm "$@" }
-npx()  { _load_nvm; npx "$@" }
+## export NVM_DIR="$HOME/.nvm"
+## _load_nvm() {
+##   unfunction nvm node npm npx 2>/dev/null
+##   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+##   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+## }
+## nvm()  { _load_nvm; nvm "$@" }
+## node() { _load_nvm; node "$@" }
+## npm()  { _load_nvm; npm "$@" }
+## npx()  { _load_nvm; npx "$@" }
 
 # shortcuts
 # CUHD: CUrl Header Dump (array, expanded into multiple args, not a single arg)
