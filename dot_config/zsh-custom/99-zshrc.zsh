@@ -87,8 +87,17 @@ esac
 # pnpm end
 
 # oh-my-posh
-if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
-  eval "$(oh-my-posh init zsh --config "$HOME/dotfiles/oh-my-posh-themes/tbnl-default.json")"
+# if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+#   eval "$(oh-my-posh init zsh --config "$HOME/dotfiles/oh-my-posh-themes/tbnl-default.json")"
+# fi
+
+
+# Prompt engine (set USE_STARSHIP=false to revert to oh-my-posh)
+if [[ "${USE_STARSHIP:-true}" == "true" ]] && command -v starship &>/dev/null; then
+  eval "$(starship init zsh)"
+elif [[ "$TERM_PROGRAM" != "Apple_Terminal" ]] && command -v oh-my-posh &>/dev/null;
+then
+  eval "$(oh-my-posh init zsh --config "$HOME/.config/omp-themes/tbnl-default.json")"
 fi
 # oh-my-posh end
 

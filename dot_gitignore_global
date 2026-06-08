@@ -6,3 +6,5 @@
 # Used as quick way to (temp) symlink related projects so they're visible in IDE
 .resources/
 
+
+**/.claude/settings.local.json
