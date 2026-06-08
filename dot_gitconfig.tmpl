@@ -5,7 +5,6 @@
 
 [commit]
 	gpgsign = true
-	# template = /Users/tibobeijen/.stCommitMsg
 
 [includeIf "gitdir:~/projects/dhl/"]
 	path = ~/.gitconfig-dhl
@@ -14,7 +13,7 @@
 	path = ~/.gitconfig-dpg
 
 [core]
-	excludesfile = {{ .chezmoi.homeDir }}/.gitignore_global
+	excludesfile = ~/.gitignore_global
 
 [init]
 	defaultBranch = main

@@ -1,0 +1,8 @@
+.DS_Store
+
+# Used for all kinds of temporary scrap
+.temp/
+
+# Used as quick way to (temp) symlink related projects so they're visible in IDE
+.resources/
+
