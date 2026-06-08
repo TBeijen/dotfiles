@@ -1,0 +1,29 @@
+IdentityFile ~/.ssh/id_ed25519
+
+Host *
+{{- if eq .chezmoi.os "darwin" }}
+    UseKeychain yes
+    AddKeysToAgent yes
+{{- end }}
+    StrictHostKeyChecking no
+
+{{- if eq .machine_type "workstation" }}
+
+# AWS SSM instances
+host i-* mi-*
+  IdentityFile ~/.ssh/dpg_id_ed25519
+  ProxyCommand ~/.ssh/aws-ssm-ec2-proxy-command.sh %h %r %p ~/.ssh/dpg_id_ed25519.pub
+  StrictHostKeyChecking no
+
+# See: https://k3d.io/v5.8.3/usage/advanced/podman/#macos
+host localhost
+  IdentityFile {{ .chezmoi.homeDir }}/.local/share/containers/podman/machine/machine
+
+# DigitalOcean
+Host do-web-002
+  Hostname {{ .do_web_ip }}
+  Port {{ .do_web_port }}
+  User t.beijen
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+{{- end }}

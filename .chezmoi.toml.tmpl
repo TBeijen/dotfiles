@@ -1,0 +1,13 @@
+{{- $machine_type := promptChoiceOnce . "machine_type" "Machine type" (list "workstation" "devcontainer" "server") -}}
+
+{{- $do_web_ip := "" -}}
+{{- $do_web_port := "" -}}
+{{- if eq $machine_type "workstation" -}}
+{{-   $do_web_ip = promptStringOnce . "do_web_ip" "DigitalOcean web IP" -}}
+{{-   $do_web_port = promptStringOnce . "do_web_port" "DigitalOcean web port" -}}
+{{- end -}}
+
+[data]
+  machine_type = {{ $machine_type | quote }}
+  do_web_ip = {{ $do_web_ip | quote }}
+  do_web_port = {{ $do_web_port | quote }}
