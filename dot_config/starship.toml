@@ -13,8 +13,6 @@ $nodejs\
 $directory\
 $git_branch\
 $git_status\
-$fill\
-$line_break\
 $character"""
 
 palette = "tbnl"
@@ -37,7 +35,7 @@ yellow = "#F3AE35"
 disabled = false
 format = "[ $symbol]($style) "
 symbol = "✓"
-not_exe_symbol = "✗"
+not_executable_symbol = "✗"
 success_style = "bold bg:bg_grey_light fg:white"
 style = "bold bg:red_bright fg:white"
 map_symbol = true
@@ -110,9 +108,6 @@ staged = " ✚${count}"
 untracked = " ?${count}"
 conflicted = " =${count}"
 stashed = ""
-
-[fill]
-symbol = " "
 
 [character]
 success_symbol = "[❯](bold green)"
