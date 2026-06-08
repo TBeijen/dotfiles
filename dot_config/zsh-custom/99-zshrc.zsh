@@ -92,8 +92,8 @@ esac
 # fi
 
 
-# Prompt engine (set USE_STARSHIP=false to revert to oh-my-posh)
-if [[ "${USE_STARSHIP:-true}" == "true" ]] && command -v starship &>/dev/null; then
+# Prompt engine (set USE_STARSHIP=true to use starship instead of oh-my-posh)
+if [[ "${USE_STARSHIP:-false}" == "true" ]] && command -v starship &>/dev/null; then
   eval "$(starship init zsh)"
 elif [[ "$TERM_PROGRAM" != "Apple_Terminal" ]] && command -v oh-my-posh &>/dev/null;
 then
