@@ -1,25 +1,30 @@
 # Starship prompt — powerline style with tbnl color palette
 # Toggle back to oh-my-posh: export USE_STARSHIP=false
-# Palette hex values: bg_grey_light=#5b64a4, bg_grey=#202237
+# Palette hex values: bg_grey_light=#5b64a4, bg_grey=#202237, terminal_bg=#0d1117 (Ghostty GitHub Dark Default)
+#  = solid right arrow,  = thin right arrow
 
 add_newline = false
 
-# Powerline separator is U+E0B0 ()
-# Using explicit hex in separators (palette names don't resolve there)
 format = """
-[](fg:#5b64a4)\
 $status\
 [](fg:#5b64a4 bg:#202237)\
 $time\
-$custom\
+[](fg:#0d1117 bg:#202237)\
 $aws\
 $azure\
+[](fg:#0d1117 bg:#202237)\
 $kubernetes\
+[](fg:#0d1117 bg:#202237)\
 $python\
+[](fg:#0d1117 bg:#202237)\
 $nodejs\
+[](fg:#0d1117 bg:#202237)\
 $directory\
+[](fg:#0d1117 bg:#202237)\
 $git_branch\
 $git_status\
+${custom.prod_warning}\
+${custom.sandbox}\
 [](fg:#202237)\
 $character"""
 
@@ -74,7 +79,7 @@ detect_env_vars = ["KUBECONFIG"]
 detect_files = []
 detect_folders = []
 detect_extensions = []
-format = "[ 󱃾 $context( :: $namespace) ]($style)"
+format = "[ ☸ $context( :: $namespace) ]($style)"
 style = "fg:k8s_blue bg:bg_grey"
 
 [python]
@@ -83,7 +88,7 @@ detect_extensions = []
 detect_files = []
 detect_folders = []
 format = "[ $symbol$virtualenv ]($style)"
-symbol = " "
+symbol = " "
 style = "fg:gold bg:bg_grey"
 python_binary = ["python3", "python"]
 
@@ -93,17 +98,17 @@ detect_extensions = []
 detect_files = []
 detect_folders = []
 format = "[ $symbol$version ]($style)"
-symbol = " "
+symbol = " "
 style = "fg:nodejs_green bg:bg_grey"
 
 [directory]
-format = "[ 󰉋 $path ]($style)"
+format = "[  $path ]($style)"
 style = "fg:cyan bg:bg_grey"
 truncation_length = 3
 truncation_symbol = "…/"
 
 [git_branch]
-format = "[  $branch(:$remote_branch) ]($style)"
+format = "[  $branch(:$remote_branch) ]($style)"
 style = "fg:dark_slate_grey bg:bg_grey"
 truncation_length = 25
 
@@ -130,9 +135,9 @@ when = '[ -n "$NONO_PROFILE" ] || [ -n "$DEVCONTAINER" ] || [ -f /.dockerenv ]'
 format = "[  $output ]($style)"
 style = "bold fg:green bg:bg_grey"
 
-# Production warning — shows when AWS profile or k8s context contains 'prod' (not 'non-prod')
+# Production warning — last segment, matches OMP position
 [custom.prod_warning]
-command = """echo '!!!'"""
+command = "echo '!!!'"
 when = '''case "${AWS_PROFILE:-}${KUBECONFIG:-}" in *non-prod*|*nonprod*) exit 1;; *prod*) exit 0;; *) exit 1;; esac'''
 format = "[ $output ]($style)"
 style = "bold fg:white bg:red_bright"
