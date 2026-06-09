@@ -11,3 +11,12 @@
   machine_type = {{ $machine_type | quote }}
   do_web_ip = {{ $do_web_ip | quote }}
   do_web_port = {{ $do_web_port | quote }}
+
+# Auto-sync mise global config before every apply.
+# Reason: `mise use -g <tool>` writes directly to ~/.config/mise/config.toml.
+# Without this hook, a subsequent `chezmoi apply` would overwrite those changes
+# with the older version from the chezmoi source. The hook re-adds the live
+# config first, so apply always works on the latest state.
+[hooks.apply.pre]
+  command = "chezmoi"
+  args = ["re-add", "~/.config/mise/config.toml"]

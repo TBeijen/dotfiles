@@ -1,6 +1,7 @@
 [tools]
-claude = "latest"
+claude = "2.1.169"
+jq = "latest"
 kubectl = "1.34"
 node = "24"
 python = "3.14"
-starship = "latest"
+starship = "1.24.0"
