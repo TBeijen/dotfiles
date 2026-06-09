@@ -1,4 +1,5 @@
 [tools]
+claude = "latest"
 kubectl = "1.34"
 node = "24"
 python = "3.14"

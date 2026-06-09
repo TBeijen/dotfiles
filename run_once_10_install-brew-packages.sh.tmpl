@@ -1,0 +1,17 @@
+{{- if eq .machine_type "workstation" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v brew &>/dev/null; then
+  echo "ERROR: Homebrew not installed. Install from https://brew.sh first."
+  exit 1
+fi
+
+if [[ ! -f "$HOME/Brewfile" ]]; then
+  echo "WARN: ~/Brewfile not found, skipping. Did chezmoi apply deploy it?"
+  exit 0
+fi
+
+echo "==> Running brew bundle from ~/Brewfile..."
+brew bundle install --file="$HOME/Brewfile" --no-lock
+{{- end }}

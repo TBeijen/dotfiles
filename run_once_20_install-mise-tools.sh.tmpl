@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v mise &>/dev/null; then
+  echo "WARN: mise not installed yet, skipping tool install"
+  exit 0
+fi
+
+echo "==> Installing mise-managed tools (from global + project .mise.toml files)..."
+mise install
