@@ -1,5 +1,9 @@
 {{- if eq .machine_type "workstation" -}}
 #!/usr/bin/env bash
+# run_onchange_ — re-runs whenever this script's content changes.
+# The Brewfile hash below makes the script content reflect Brewfile state,
+# so editing the Brewfile triggers a re-run.
+# Brewfile hash: {{ include "Brewfile" | sha256sum }}
 set -euo pipefail
 
 if ! command -v brew &>/dev/null; then
@@ -15,5 +19,5 @@ fi
 echo "==> Running brew bundle from ~/Brewfile..."
 # --no-upgrade: install missing packages but don't upgrade outdated ones;
 # upgrades happen explicitly via `brew upgrade` on the user's cadence.
-brew bundle install --file="$HOME/Brewfile" --no-lock --no-upgrade
+brew bundle install --file="$HOME/Brewfile" --no-upgrade
 {{- end }}

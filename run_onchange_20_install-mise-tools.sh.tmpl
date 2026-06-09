@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# run_onchange_ — re-runs when this script's content changes.
+# The mise config hash below makes the script content reflect config state,
+# so editing the mise config triggers a re-run.
+# mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+set -euo pipefail
+
+if ! command -v mise &>/dev/null; then
+  echo "WARN: mise not installed yet, skipping tool install"
+  exit 0
+fi
+
+echo "==> Installing mise-managed tools (from global + project .mise.toml files)..."
+mise install
