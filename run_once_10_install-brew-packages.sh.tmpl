@@ -13,5 +13,7 @@ if [[ ! -f "$HOME/Brewfile" ]]; then
 fi
 
 echo "==> Running brew bundle from ~/Brewfile..."
-brew bundle install --file="$HOME/Brewfile" --no-lock
+# --no-upgrade: install missing packages but don't upgrade outdated ones;
+# upgrades happen explicitly via `brew upgrade` on the user's cadence.
+brew bundle install --file="$HOME/Brewfile" --no-lock --no-upgrade
 {{- end }}
