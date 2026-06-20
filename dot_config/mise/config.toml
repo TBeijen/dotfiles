@@ -1,5 +1,6 @@
 [tools]
 claude = "2.1.169"
+fnox = "1.27.1"
 jq = "latest"
 kubectl = "1.34"
 node = "24"
