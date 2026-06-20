@@ -208,44 +208,90 @@ style = "bold green"
 
 **Goal:** Move secrets out of the shell environment. Establish the credential model that LLM sandboxing builds on. This is the core security phase.
 
-**What fnox replaces:**
+### Architecture: shared credentials file, separate location
+
+fnox writes AWS STS sessions as named profiles to `~/.aws/fnox-credentials` (NOT the default `~/.aws/credentials`). The dev shell sets `AWS_SHARED_CREDENTIALS_FILE=~/.aws/fnox-credentials` to point AWS SDK there. Reasons:
+- Clean separation from any legacy keys in `~/.aws/credentials`
+- Sandboxes (nono, devcontainers) expose only the fnox file — never the SSO cache, never legacy keys
+- `aws sso login` workflow on host remains untouched (uses `~/.aws/sso/cache/`)
+- Easy to wipe (`rm ~/.aws/fnox-credentials`) without affecting other AWS state
+
+The credentials file holds **multiple coexisting profiles**, refreshed by a fnox daemon on the host:
+
+```ini
+# ~/.aws/fnox-credentials — managed by fnox daemon
+[dpg-ps-ops-ro]
+aws_access_key_id = ASIA...
+aws_session_token = ...
+expiration = 2026-06-20T22:00:00Z   # 8h TTL, refreshed by daemon
+
+[dpg-ps-nonpr-ro]
+# ...
+
+# Elevated sessions appear here on `elevate`, expire on their own (no refresh)
+[dpg-ps-ops-elevated]
+aws_access_key_id = ASIA...
+expiration = 2026-06-20T16:30:00Z   # 15min TTL
+```
+
+The "active" credential set is just an `AWS_PROFILE` pointer. No silent upgrade between `-ro` and `-elevated` — explicit switch only. The prompt shows current AWS_PROFILE.
+
+### Profile naming convention
+
+- `<workspace>-ro` — read-only, fnox-managed, long-ish TTL with auto-refresh
+- `<workspace>-elevated` — short-TTL admin, only present after explicit `elevate`
+- Existing SSO-config profile names (e.g., `dpg-ps-ops-ad`) remain in `~/.aws/config` for direct SSO use on host, unchanged
+
+### Multi-store backend strategy
+
+Different secret types live in different backends, chosen by sensitivity:
+
+| Backend | Used for | Why |
+|---------|----------|-----|
+| **fnox AWS STS lease** | All AWS credentials | Uses your existing SSO session; nothing stored persistently |
+| **macOS Keychain** | High-sensitivity long-lived secrets (GitHub PAT, JIRA token) | TouchID prompt per access — friction is the point |
+| **Bitwarden (separate work account)** OR **LastPass** | Lower-sensitivity work secrets, optional | Sync across machines if needed. Personal Bitwarden NOT used — full vault exposure to CLI is too broad |
+| **age + chezmoi files** | Secrets that must be portable + version-controlled | Encrypted at rest in the dotfiles repo |
+
+The personal Bitwarden vault is explicitly NOT used by fnox — `bw unlock` exposes the entire vault to any process with the session, which is the wrong shape for the threat model (LLM agents, supply chain).
+
+### What fnox replaces
+
 - `~/.env` file sourced at shell start — secrets like `DPG_AKAMAI_UNHIDE` move to fnox with `env = false`
 - `aws_set_profile()`, `aws_login()`, `aws_mfa()`, `aws_sso_to_iam()` — fnox AWS STS backend handles credential acquisition
-- nono's `apple-password://` broker for `GH_TOKEN` — fnox becomes the single credential broker
+- nono's `apple-password://` broker for `GH_TOKEN` — fnox becomes the single credential broker (via Keychain backend)
 
-**What fnox does NOT replace (keep these):**
+### What fnox does NOT replace (keep these)
+
 - `aws_ecr_login()`, `aws-logins()`, `aws_ec2_find()`, `aws_eks_kubeconfig()`, `aws_asg_*()` — operational tools that consume credentials
 - `kube_*` functions — operational k8s utilities
 - `zscaler_bundle_on/off` — CA bundle management (not a secret)
 
-**Steps:**
-1. Install fnox via mise (`mise use -g fnox`)
-2. Create `~/.config/fnox/fnox.toml` with initial secret definitions:
-   - `GH_TOKEN` (backend: bitwarden, `env = false`)
-   - `DPG_AKAMAI_UNHIDE` (backend: bitwarden, `env = false`)
-3. Refactor the Akamai curl shortcuts (`CUAD`/`CUADF`) to call `fnox get` on demand instead of baking the secret into exported arrays at shell start
-4. Remove the `~/.env` sourcing
-5. Set up fnox AWS STS leases for one trial workspace (e.g., `tbnl/dev-ro`):
-   - Create `fnox.toml` in the workspace directory
-   - Configure AWS STS backend pointing to the SSO profile
-   - Verify `fnox exec -- aws sts get-caller-identity` returns the expected role
-6. Gradually migrate remaining workspaces
+### Steps
 
-**fnox + Bitwarden:**
-- fnox supports Bitwarden as a backend natively
-- Store GH PAT, Akamai token in a dedicated Bitwarden folder
-- Secrets are fetched on demand, never written to disk as plaintext
-- Portable across machines (unlike keychain)
+1. **Install fnox** via mise (`mise use -g fnox`)
+2. **Set `AWS_SHARED_CREDENTIALS_FILE`** in dev shell init (`~/.config/zsh-custom/`) — points to `~/.aws/fnox-credentials`
+3. **Configure one trial workspace's `-ro` profile** in `~/.config/fnox/fnox.toml`:
+   - AWS STS lease backend, references existing SSO session
+   - Writes to `~/.aws/fnox-credentials` as `<workspace>-ro`
+   - 8h TTL
+4. **Manually create the lease**, verify file is written, verify `AWS_PROFILE=<workspace>-ro aws sts get-caller-identity` returns expected RO role
+5. **Set up fnox daemon mode** so refresh happens automatically before TTL expiry
+6. **Expand to all workspaces' `-ro` profiles**
+7. **Create `elevate` script** — fnox lease for admin role, short TTL, writes `-elevated` profile to same file
+8. **Set up a non-AWS secret** via Keychain backend (e.g., a GitHub fine-grained PAT) — verify `fnox get gh-readonly-pat` prompts TouchID and returns the value, while not exporting it to environment
+9. **Replace `~/.env` sourcing** and refactor `CUAD`/`CUADF` curl shortcuts to call `fnox get` on demand
 
-**GitHub PATs for fnox (preparation for Phases 6+7):**
-Create fine-grained PATs on GitHub scoped narrowly:
+### GitHub PATs (stored in Keychain)
+
+Create fine-grained PATs on GitHub scoped narrowly, store each in Keychain (TouchID per access):
 - **claude-readonly**: `contents: read`, `metadata: read` on specific repos — for LLM agents
 - **claude-push**: `contents: write`, `metadata: read` on specific repos — for LLM push (no admin, no branch protection bypass)
 - **interactive**: broader scope for interactive shell use (or keep using SSH auth key on host)
 
-Store all PATs in Bitwarden, inject via fnox. Each PAT maps to a fnox secret with appropriate `env` setting.
+Each PAT becomes a fnox secret with `env = false`. MCP allowlist (Phase 6) determines which the agent can request.
 
-**Fallback:** Re-add `~/.env` sourcing, revert curl shortcuts. fnox secrets stay in Bitwarden regardless.
+**Fallback:** Re-add `~/.env` sourcing, revert curl shortcuts. Don't set `AWS_SHARED_CREDENTIALS_FILE` — SDK falls back to default `~/.aws/credentials` (untouched). fnox secrets stay in their backends regardless.
 
 ## Phase 5: Evolve sw() — Workspace Orchestration
 
