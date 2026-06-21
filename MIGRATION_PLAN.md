@@ -293,33 +293,191 @@ Each PAT becomes a fnox secret with `env = false`. MCP allowlist (Phase 6) deter
 
 **Fallback:** Re-add `~/.env` sourcing, revert curl shortcuts. Don't set `AWS_SHARED_CREDENTIALS_FILE` — SDK falls back to default `~/.aws/credentials` (untouched). fnox secrets stay in their backends regardless.
 
-## Phase 5: Evolve sw() — Workspace Orchestration
+## Phase 5: Evolve sw() — Workspace + Role Orchestration (revised design)
 
-**Goal:** Wire mise + fnox into `sw()`. Keep current workspace directory structure and UX. `sw <project> <env> [<cluster>]` works as before, but credentials come from fnox instead of `.envrc` + `AWS_PROFILE`.
+**Goal:** Replace autoenv-based `sw()` with mise-native variant. Decouple **role** from **workspace** — role is a property of the active session (selected via mise overlay), not a separate workspace directory. Workspace count drops, intent is always explicit, mise replaces the unmaintained autoenv dependency.
 
-**Approach:** Keep existing directories (`tbnl/dev-ro`, `dpg/ps-ops-do`, etc.). Add `fnox.toml` alongside existing `.envrc`. New `sw()` prefers fnox when available, falls back to autoenv when not.
+### Layering model
 
-**Coexistence pattern per workspace:**
+Four orthogonal selectors, each with its own mechanism:
+
+| Layer | Today | Proposed |
+|-------|-------|----------|
+| Client | `~/workspaces/<client>/...` directory | Same |
+| Env (account context) | `~/workspaces/<client>/<env>/` directory (with role suffix) | `~/workspaces/<client>/<env>/` (role removed from name) |
+| Role | Baked into env dir name (`ps-ops-do`, `ps-ops-ad`) | mise overlay (`.mise.<role>.toml`) selected via `MISE_ENV` |
+| Cluster | Filename in `.kube/` (already a separate selector) | Same |
+
+### Directory structure
+
 ```
-~/workspaces/tbnl/dev-ro/
-  .envrc              # existing — fallback
-  .envrc.leave        # existing — fallback
-  .mise.toml          # new — tool versions (optional)
-  fnox.toml           # new — credential definition
-  .kube/
-    d -> ...          # unchanged
+~/workspaces/
+  dpg/
+    ps-ops/
+      .mise.toml         # base — tools + common workspace env, NO role/AWS_PROFILE
+      .mise.ro.toml      # read-only role overlay
+      .mise.do.toml      # devops role overlay
+      .mise.ad.toml      # admin role overlay
+      .kube/
+        d                # cluster kubeconfig files
+        n
+    ps-nonpr/
+      .mise.toml
+      .mise.do.toml
+      .mise.ad.toml      # no .ro.toml — RO not used here
+    ps-prod/
+    seo/
+    reco/                # only .mise.ro.toml — RO is the only available role
+  tbnl/
+    dev/
+      .mise.toml
+      .mise.ro.toml
+      .mise.ad.toml
+    prod/
+    manage/
 ```
 
-**Steps:**
-1. Add `fnox.toml` to one trial workspace
-2. Modify `sw()`: check for `fnox.toml` and activate credentials, else fall back to autoenv
-3. Add `sw-admin` companion for credential elevation:
-   - Spawns a subshell with admin-level fnox profile
-   - TTL-bounded (e.g., 15 min default)
-   - starship prompt shows elevation warning
-4. Migrate workspaces one by one
+Each workspace's allowed roles = which `.mise.<role>.toml` files exist there. That doubles as discovery: `ls .mise.*.toml` shows the role set.
 
-**Fallback:** Remove fnox checks from `sw()`. autoenv `.envrc` files work as before.
+### File contents
+
+**`.mise.toml` (base — workspace identity + tools):**
+```toml
+[tools]
+terraform = "1.10"
+helm = "3.16"
+
+[env]
+WS_CLIENT = "dpg"
+WS_ENV    = "ps-ops"
+```
+
+**`.mise.<role>.toml` (role overlay — minimal):**
+```toml
+[env]
+WS_ROLE     = "do"
+AWS_PROFILE = "dpg-ps-ops-do"
+# Optional: FNOX_PROFILE = "dpg" — scope which secrets are visible this session
+```
+
+### Command surface
+
+```bash
+sw <client> <env> <role> [<cluster>]    # role is REQUIRED — no implicit default
+sw                                       # leave workspace
+elevate [<cluster>]                      # shortcut: re-sw to ad role on current workspace
+```
+
+Examples:
+- `sw dpg ps-ops do d` — devops on ops cluster (most common)
+- `sw dpg ps-ops ad d` — admin (intentional, friction OK)
+- `sw tbnl dev ro` — read-only browse, no cluster
+- `elevate d` — current workspace + ad role + cluster d
+
+### sw() implementation sketch
+
+```bash
+sw() {
+  if [[ $# -eq 0 ]]; then
+    eval "$(mise hook-env --cd $HOME)"
+    unset KUBECONFIG WS_CLIENT WS_ENV WS_ROLE WORKSPACES_ACTIVE_ENV
+    return 0
+  fi
+
+  if [[ $# -lt 3 ]]; then
+    echo "Usage: sw <client> <env> <role> [<cluster>]"
+    return 1
+  fi
+
+  local client="$1" env="$2" role="$3" cluster="$4"
+  local ws="$WORKSPACES_ROOT/${client}/${env}"
+
+  [[ -d "$ws" ]]                       || { echo "ERROR: $ws not found"; return 1; }
+  [[ -f "$ws/.mise.toml" ]]            || { echo "ERROR: no .mise.toml in $ws"; return 1; }
+  [[ -f "$ws/.mise.${role}.toml" ]]    || {
+    local available=$(ls $ws/.mise.*.toml 2>/dev/null | sed 's/.*\.mise\.\(.*\)\.toml/\1/' | grep -v "^toml$" | tr '\n' ' ')
+    echo "ERROR: role '$role' not available for $client/$env. Available: $available"
+    return 1
+  }
+
+  # Activate base + role overlay
+  eval "$(MISE_CONFIG_FILE=$ws/.mise.toml MISE_ENV=$role mise hook-env)"
+
+  # Optional cluster
+  if [[ -n "$cluster" ]]; then
+    local kc="$ws/.kube/${cluster}"
+    [[ -r "$kc" ]] || { echo "ERROR: $kc not found"; return 1; }
+    export KUBECONFIG="$kc"
+  else
+    unset KUBECONFIG
+  fi
+
+  export WORKSPACES_ACTIVE_ENV="${client}/${env}/${role}"
+
+  # Optional audit log
+  echo "$(date +%FT%T) ${client}/${env}/${role} cluster=${cluster:-none}" >> ~/.local/state/sw-history.log
+}
+
+elevate() {
+  [[ -z "$WS_CLIENT" ]] && { echo "No active workspace"; return 1; }
+  sw "$WS_CLIENT" "$WS_ENV" ad "$@"
+}
+```
+
+### AWS credentials lifecycle
+
+**On host (uses SSO cache natively):**
+- `sw` sets `AWS_PROFILE=<client>-<env>-<role>` (e.g., `dpg-ps-ops-do`)
+- AWS SDK reads `~/.aws/config`, sees SSO profile, uses `~/.aws/sso/cache/` to mint STS on demand
+- Nothing fnox-specific needed for host AWS — the existing SSO workflow continues
+- For elevation: `elevate d` switches AWS_PROFILE to `-ad`; if SSO session lacks that role, `aws sso login --profile <ws>-ad` is the next step
+
+**In sandbox (uses written credentials file):**
+- AWS_PROFILE same as host, but reads `~/.aws/fnox-credentials` (mounted ro from host)
+- Host periodic refresh script writes RO/DO STS sessions there (long-ish TTL, e.g., 8h)
+- AD profile entries written only on explicit elevation request — short TTL (15-30min)
+- Refresh mechanism uses `aws configure export-credentials --profile X --format process-credentials` to extract STS from SSO
+- SSO cache never enters sandbox
+
+### Prompt requirements
+
+`WS_ROLE` becomes part of prompt. Visual distinction by role (especially `ad` red). Starship/OMP already supports env-var-based segments.
+
+### Tab completion
+
+`sw <TAB>` → clients (dir listing)
+`sw dpg <TAB>` → envs (dir listing)
+`sw dpg ps-ops <TAB>` → roles (parse `.mise.*.toml` files)
+`sw dpg ps-ops do <TAB>` → clusters (`.kube/` listing)
+
+### Optional enhancements
+
+- **Confirmation prompt on `ad`** — opt-out via `SW_NO_CONFIRM=1`
+- **Audit log** at `~/.local/state/sw-history.log` (small append per `sw` call)
+- **Drift detection** — `sw` calls `aws sts get-caller-identity` after activation, warns if returned role doesn't match expected (off by default — adds latency)
+- **Role-scoped fnox profile** — overlay sets `FNOX_PROFILE`, `sw` triggers `fnox activate "$FNOX_PROFILE"` to scope secrets per workspace
+
+### Migration approach
+
+Per workspace, one at a time:
+
+1. Pick lowest-stakes (e.g., `tbnl/dev`) — create `tbnl/dev/.mise.toml` + `.mise.ro.toml` + `.mise.ad.toml`
+2. Update `sw()` to handle new-style workspaces — old `.envrc`-based workspaces continue to work via fallback
+3. Test: `sw tbnl dev ro`, `elevate`, verify AWS_PROFILE and prompt
+4. Migrate next workspace
+5. After all migrated, delete `-ro`/`-ad`/`-do` legacy dirs and autoenv fallback
+
+### Fallback
+
+Old workspaces with `.envrc` continue to work through `sw()` fallback path. Delete `.mise.toml` files and `sw()` reverts to autoenv invocation for that workspace.
+
+### Things to watch
+
+- **mise `MISE_ENV=<role>` semantics:** verify mise actually loads `.mise.<role>.toml` as overlay-on-base when `MISE_CONFIG_FILE` points to base. Validate on first workspace.
+- **`mise hook-env --cd $HOME` cleanup:** small bend of mise, but documented mechanism. Confirm no env vars leak between switches.
+- **Per-shell isolation:** each shell has independent `AWS_PROFILE`/`KUBECONFIG` (current behavior preserved).
+- **Cross-account/cross-cluster operations:** `AWS_PROFILE` and `KUBECONFIG` are bundled by `sw`. Ad-hoc `KUBECONFIG=... kubectl ...` still works for one-offs.
+- **Elevation expiry visibility:** AWS STS expires server-side, but shell still shows `WS_ROLE=ad`. Optional background timer or starship segment checking caller-identity covers this.
 
 ## Phase 6: Harden LLM Sandboxing — nono + fnox MCP
 
