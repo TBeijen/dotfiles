@@ -1,86 +1,112 @@
-# --- set_workspace (sw) + completions (zsh-native + bash) -----------------
+# sw — workspace+role activation
+#
+# Usage:
+#   sw <client> <env> <role> [<cluster>]   activate workspace+role
+#   sw                                       leave workspace
+#
+# Workspace layout expected:
+#   ~/workspaces/<client>/<env>/
+#     mise.toml          # base — common workspace env (WS_CLIENT, WS_ENV)
+#     mise.<role>.toml   # role overlay (WS_ROLE, AWS_PROFILE)
+#     .kube/<cluster>    # cluster kubeconfig files
+#
+# Roles available per workspace = which mise.<role>.toml files exist.
+#
+# Mechanism: MISE_CONFIG_DIR points mise at the workspace dir.
+# MISE_ENV selects the overlay. mise's auto-hook applies env vars
+# on every prompt redraw and unsets them on leave. We invoke
+# `mise hook-env` synchronously to avoid a one-prompt-late redraw
+# caused by oh-my-posh's precmd running before mise's precmd.
 
-# Only proceed for interactive shells
-case $- in *i*) ;; *) return 0 2>/dev/null || exit 0 ;; esac
-
-# ---------------- sw function ----------------
 sw() {
   local WS_ROOT=${WORKSPACES_ROOT:-"$HOME/workspaces"}
-  local WS_KUBE WS_RESET WS_PROJ WS_ENV
-  case $# in
-    0) WS_RESET=True ;;
-    2) WS_PROJ=${1}; WS_ENV=${2} ;;
-    3) WS_PROJ=${1}; WS_ENV=${2}; WS_KUBE=${3} ;;
-    *) echo "USAGE: $0 <project> <environment> [<k8s_cluster>]"; return 1 ;;
-  esac
 
-  # Leave current workspace (do this from the active workspace)
-  if [[ -n "$AUTOENV_ENABLE_LEAVE" && -n "${WORKSPACES_ACTIVE_ENV}" ]]; then
-    autoenv_leave "${WORKSPACES_ACTIVE_ENV}"
-  fi
-
-  # Reset if no args
-  if [[ -n ${WS_RESET} ]]; then
-    unset KUBECONFIG
+  # Leave workspace
+  if [[ $# -eq 0 ]]; then
+    unset MISE_CONFIG_DIR MISE_ENV KUBECONFIG WORKSPACES_ACTIVE_ENV
+    if command -v mise &>/dev/null; then
+      eval "$(mise hook-env -s zsh 2>/dev/null)"
+    fi
     return 0
   fi
 
-  # Construct and validate path
-  local WS_PATH=${WS_ROOT}/${WS_PROJ}/${WS_ENV}
-  if [[ ! -d ${WS_PATH} ]]; then
-    echo "ERROR: Directory ${WS_PATH} not found"
+  if [[ $# -lt 3 ]]; then
+    echo "Usage: sw <client> <env> <role> [<cluster>]"
+    echo "       sw                                     (leave workspace)"
     return 1
   fi
 
-  # Enter workspace (.envrc)
-  PWD=${WS_PATH} WORKSPACES_ROOT=${WS_ROOT} AUTOENV_ENABLE_LEAVE="" autoenv_init
-  export WORKSPACES_ACTIVE_ENV=${WS_PATH}
+  local client="$1" env="$2" role="$3" cluster="$4"
+  local ws="${WS_ROOT}/${client}/${env}"
 
-  # Optional kubeconfig (file within .kube)
-  if [[ -n ${WS_KUBE} ]]; then
-    local WS_KUBE_CONFIG=${WS_PATH}/.kube/${WS_KUBE}
-    if [[ ! -r ${WS_KUBE_CONFIG} ]]; then
-      echo "ERROR: ${WS_KUBE_CONFIG} not found"
-      return 1
-    fi
-    export KUBECONFIG=${WS_KUBE_CONFIG}
+  [[ -d "$ws" ]] || { echo "ERROR: workspace not found: $ws"; return 1; }
+  [[ -f "$ws/mise.toml" ]] || { echo "ERROR: no mise.toml in $ws"; return 1; }
+
+  if [[ ! -f "$ws/mise.${role}.toml" ]]; then
+    local available=$(ls "$ws"/mise.*.toml 2>/dev/null \
+      | sed "s|.*/mise\.\(.*\)\.toml|\1|" \
+      | grep -v "^toml$" \
+      | tr '\n' ' ')
+    echo "ERROR: role '$role' not defined for ${client}/${env}"
+    echo "Available roles: ${available:-none}"
+    return 1
+  fi
+
+  export MISE_CONFIG_DIR="$ws"
+  export MISE_ENV="$role"
+
+  if command -v mise &>/dev/null; then
+    eval "$(mise hook-env -s zsh 2>/dev/null)"
+  fi
+
+  if [[ -n "$cluster" ]]; then
+    local kc="${ws}/.kube/${cluster}"
+    [[ -r "$kc" ]] || { echo "ERROR: cluster file not found: $kc"; return 1; }
+    export KUBECONFIG="$kc"
   else
     unset KUBECONFIG
   fi
+
+  export WORKSPACES_ACTIVE_ENV="${client}/${env}/${role}"
 }
 
-: "${WORKSPACES_ROOT:=$HOME/workspaces}"
+# ---------------- Tab completion (zsh-native) ----------------
+# Only proceed for interactive shells
+case $- in *i*) ;; *) return 0 2>/dev/null || exit 0 ;; esac
 
-# ---------------- Shared helpers ----------------
 _sw_basename() {
   local p="$1"; p="${p%/}"; printf '%s\n' "${p##*/}"
 }
 
-_sw_list_child_dirs_one_level() {
-  local root="$1" d name
+# List immediate subdirs of $1. If must_have_mise=1, only include dirs containing mise.toml.
+_sw_list_dirs() {
+  local root="$1" must_have_mise="${2:-0}" d name
   [[ -d "$root" ]] || return 0
   for d in "$root"/*(N); do
     name="$(_sw_basename "$d")"
     [[ "$name" == .* ]] && continue
-    if [[ -d "$d" || ( -L "$d" && -d "${d:A}" ) ]]; then
-      print -r -- "$name"
+    [[ -d "$d" || ( -L "$d" && -d "${d:A}" ) ]] || continue
+    if [[ "$must_have_mise" == "1" ]]; then
+      [[ -f "$d/mise.toml" ]] || continue
     fi
+    print -r -- "$name"
   done 2>/dev/null
 }
 
-_sw_resolved_kube_dir() {
-  local proj="$1" env="$2" base="$WORKSPACES_ROOT/$proj/$env"
-  [[ -d "$base" ]] || return 0
-  (
-    cd "$base" 2>/dev/null || exit 0
-    [[ -d ".kube" ]] || exit 0
-    cd -P ".kube" 2>/dev/null || exit 0
-    pwd
-  )
+_sw_list_roles() {
+  local ws="$1" f name role
+  [[ -d "$ws" ]] || return 0
+  for f in "$ws"/mise.*.toml(N); do
+    name="$(_sw_basename "$f")"
+    role="${name#mise.}"
+    role="${role%.toml}"
+    [[ "$role" == "toml" ]] && continue
+    print -r -- "$role"
+  done 2>/dev/null
 }
 
-_sw_list_kube_files() {
-  local kube_dir="$1" f name
+_sw_list_clusters() {
+  local kube_dir="${1}/.kube" f name
   [[ -d "$kube_dir" ]] || return 0
   for f in "$kube_dir"/*(N); do
     name="$(_sw_basename "$f")"
@@ -89,9 +115,7 @@ _sw_list_kube_files() {
   done 2>/dev/null
 }
 
-# ---------------- zsh-native completion ----------------
 if [[ -n ${ZSH_VERSION-} ]]; then
-  # Make sure completion system is initialized
   if ! whence -w compinit >/dev/null; then
     autoload -U +X compinit
   fi
@@ -99,56 +123,36 @@ if [[ -n ${ZSH_VERSION-} ]]; then
     _sw() {
       local -a suggestions
       local curcontext="$curcontext" state line
+      local WS_ROOT=${WORKSPACES_ROOT:-"$HOME/workspaces"}
+
       _arguments -C \
-        '1:project:->project' \
-        '2:environment:->env' \
-        '3:k8s_cluster:->cluster' && return
+        '1:client:->client' \
+        '2:env:->env' \
+        '3:role:->role' \
+        '4:cluster:->cluster' && return
 
       case $state in
-        project)
-          suggestions=($(_sw_list_child_dirs_one_level "$WORKSPACES_ROOT"))
-          _describe -t projects 'projects' suggestions && return
+        client)
+          suggestions=($(_sw_list_dirs "$WS_ROOT"))
+          _describe -t clients 'clients' suggestions && return
           ;;
         env)
-          local proj=${words[2]}
-          suggestions=($(_sw_list_child_dirs_one_level "$WORKSPACES_ROOT/$proj"))
-          _describe -t environments 'environments' suggestions && return
+          local client=${words[2]}
+          suggestions=($(_sw_list_dirs "$WS_ROOT/$client" 1))
+          _describe -t envs 'envs' suggestions && return
+          ;;
+        role)
+          local client=${words[2]} env=${words[3]}
+          suggestions=($(_sw_list_roles "$WS_ROOT/$client/$env"))
+          _describe -t roles 'roles' suggestions && return
           ;;
         cluster)
-          local proj=${words[2]} env=${words[3]}
-          local kube_dir="$(_sw_resolved_kube_dir "$proj" "$env")"
-          suggestions=($(_sw_list_kube_files "$kube_dir"))
-          _describe -t clusters 'k8s clusters' suggestions && return
+          local client=${words[2]} env=${words[3]}
+          suggestions=($(_sw_list_clusters "$WS_ROOT/$client/$env"))
+          _describe -t clusters 'clusters' suggestions && return
           ;;
       esac
     }
   fi
   compdef _sw sw
-fi
-
-# ---------------- bash completion (if sourced under bash) ----------------
-if [[ -n ${BASH_VERSION-} ]]; then
-  _sw_complete_bash() {
-    local cur words cword
-    COMPREPLY=()
-    words=("${COMP_WORDS[@]}")
-    cword=$COMP_CWORD
-    cur="${COMP_WORDS[COMP_CWORD]}"
-
-    if (( cword == 1 )); then
-      COMPREPLY=( $(compgen -W "$(_sw_list_child_dirs_one_level "$WORKSPACES_ROOT")" -- "$cur") )
-    elif (( cword == 2 )); then
-      local proj="${words[1]}"
-      COMPREPLY=( $(compgen -W "$(_sw_list_child_dirs_one_level "$WORKSPACES_ROOT/$proj")" -- "$cur") )
-    elif (( cword == 3 )); then
-      local proj="${words[1]}" env="${words[2]}"
-      local kube_dir="$(_sw_resolved_kube_dir "$proj" "$env")"
-      if [[ -n "$kube_dir" ]]; then
-        COMPREPLY=( $(compgen -W "$(_sw_list_kube_files "$kube_dir")" -- "$cur") )
-      fi
-    fi
-    return 0
-  }
-  type compopt >/dev/null 2>&1 && compopt -o nospace >/dev/null 2>&1
-  complete -F _sw_complete_bash -o default -o bashdefault sw 2>/dev/null || true
 fi
