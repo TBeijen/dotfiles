@@ -47,7 +47,7 @@ mise-bump() {
     echo "WARN: chezmoi not found — skipping source sync"
     return 0
   fi
-  chezmoi re-add ~/.config/mise/config.toml >/dev/null
+  chezmoi re-add ~/.config/mise/config.toml ~/.config/mise/mise.lock 2>/dev/null
   echo ""
   echo "✓ Re-added to chezmoi source"
 
@@ -64,7 +64,7 @@ mise-bump() {
     return 0
   fi
 
-  git -C "$chezmoi_dir" add dot_config/mise/config.toml
+  git -C "$chezmoi_dir" add dot_config/mise/config.toml dot_config/mise/mise.lock 2>/dev/null
   git -C "$chezmoi_dir" commit -m "mise bump: $*"
   echo "✓ Committed"
 
