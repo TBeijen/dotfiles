@@ -14,12 +14,3 @@ pager = ""
   machine_type = {{ $machine_type | quote }}
   do_web_ip = {{ $do_web_ip | quote }}
   do_web_port = {{ $do_web_port | quote }}
-
-# Auto-sync mise global config + lockfile before every apply.
-# Reason: `mise use -g <tool>` and `mise install` write directly to these files.
-# Without this hook, a subsequent `chezmoi apply` would overwrite those changes
-# with older versions from the chezmoi source. The hook re-adds the live files
-# first, so apply always works on the latest state.
-[hooks.apply.pre]
-  command = "chezmoi"
-  args = ["re-add", "~/.config/mise/config.toml", "~/.config/mise/mise.lock"]
