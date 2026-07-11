@@ -23,6 +23,7 @@ cask "gimp"
 cask "iterm2"
 cask "microsoft-auto-update"
 cask "microsoft-teams"
+cask "netbirdio/tap/netbird-ui"
 cask "notion"
 cask "podman-desktop"
 cask "rancher"
@@ -39,7 +40,7 @@ cask "wireshark-app"
 cask "font-meslo-lg-nerd-font"   # nerd font used by starship / oh-my-posh
 
 # Mac App Store apps (requires mas)
-mas "Tailscale", id: 1475387142
+# mas "Tailscale", id: 1475387142
 mas "System Color Picker", id: 1545870783
 
 # VScode extensions
