@@ -1,0 +1,22 @@
+{
+  "env": {
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_FOUNDRY_API_KEY": "{{ .anthropic_foundry_api_key }}",
+    "ANTHROPIC_FOUNDRY_RESOURCE": "foundry-individual",
+    "CLAUDE_CODE_USE_FOUNDRY": "1"
+  },
+  "hooks": {},
+  "statusLine": {
+    "type": "command",
+    "command": "bash {{ .chezmoi.homeDir }}/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "nono@always-further": true
+  },
+  "effortLevel": "xhigh",
+  "model": "sonnet",
+  "gitCoAuthoredBy": false
+}

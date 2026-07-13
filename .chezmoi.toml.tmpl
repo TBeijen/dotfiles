@@ -7,6 +7,8 @@
 {{-   $do_web_port = promptStringOnce . "do_web_port" "DigitalOcean web port" -}}
 {{- end -}}
 
+{{- $anthropic_foundry_api_key := promptStringOnce . "anthropic_foundry_api_key" "Anthropic Foundry API key" -}}
+
 # Disable paging for chezmoi output — diffs/verbose output flow inline.
 pager = ""
 
@@ -14,3 +16,4 @@ pager = ""
   machine_type = {{ $machine_type | quote }}
   do_web_ip = {{ $do_web_ip | quote }}
   do_web_port = {{ $do_web_port | quote }}
+  anthropic_foundry_api_key = {{ $anthropic_foundry_api_key | quote }}
