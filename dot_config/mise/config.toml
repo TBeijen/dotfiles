@@ -2,6 +2,7 @@
 # Intent-level constraints. Exact versions + checksums live in mise.lock.
 claude = "2"
 fnox = "1"
+git-filter-repo = "latest"
 jq = "1"
 kubectl = "1.34"
 node = "26"

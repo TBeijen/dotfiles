@@ -42,8 +42,11 @@ mise-up() {
     return 0
   fi
 
-  git -C "$chezmoi_dir" add dot_config/mise/config.toml dot_config/mise/mise.lock 2>/dev/null
-  git -C "$chezmoi_dir" commit -m "mise up: bump tool versions"
+  git -C "$chezmoi_dir" add dot_config/mise/
+  if ! git -C "$chezmoi_dir" commit -m "mise up: bump tool versions"; then
+    echo "✗ Commit failed — nothing staged?"
+    return 1
+  fi
   echo "✓ Committed"
 
   if git -C "$chezmoi_dir" push; then
