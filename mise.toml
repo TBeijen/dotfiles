@@ -1,0 +1,6 @@
+# Project-local dev tooling for the chezmoi source repo itself.
+# NOT a deployed dotfile — see .chezmoiignore. Bootstrap with:
+#   mise install && hk install
+[tools]
+hk       = "1"
+gitleaks = "8"

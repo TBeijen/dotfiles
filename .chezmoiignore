@@ -1,3 +1,7 @@
 MIGRATION_PLAN.md
 NOTES.md
 SANDBOX_BROKER_PLAN.md
+
+# hk / mise tooling for this repo — tracked in git, not applied to $HOME
+hk.pkl
+mise.toml

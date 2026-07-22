@@ -1,0 +1,26 @@
+amends "package://github.com/jdx/hk/releases/download/v1.49.0/hk@1.49.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.49.0/hk@1.49.0#/Builtins.pkl"
+
+local linters = new Mapping<String, Step> {
+    ["gitleaks"] = Builtins.gitleaks
+    ["trailing_whitespace"] = Builtins.trailing_whitespace
+    ["newlines"] = Builtins.newlines
+}
+
+hooks {
+    ["pre-commit"] {
+        fix = true          // auto-fix whitespace/newlines, re-stage
+        stash = "git"       // stash unstaged changes during run
+        steps = linters
+    }
+    ["pre-push"] {
+        steps = linters     // backstop: secret scan before push
+    }
+    ["check"] {
+        steps = linters     // `hk check` — manual, read-only
+    }
+    ["fix"] {
+        fix = true          // `hk fix` — manual fixup
+        steps = linters
+    }
+}
