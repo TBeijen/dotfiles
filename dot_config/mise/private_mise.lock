@@ -23,6 +23,45 @@ url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d
 [tools.claude."platforms.macos-x64"]
 url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.215/darwin-x64/claude"
 
+[[tools.copilot]]
+version = "1.0.73"
+backend = "aqua:github/copilot-cli"
+
+[tools.copilot."platforms.linux-arm64"]
+checksum = "sha256:16f824ab3cdcf51a75ad907c84242805911cafc6519aaf58d09e0ae4eb1fc1cd"
+url = "https://github.com/github/copilot-cli/releases/download/v1.0.73/copilot-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/github/copilot-cli/releases/assets/484054948"
+
+[tools.copilot."platforms.linux-arm64-musl"]
+checksum = "sha256:16f824ab3cdcf51a75ad907c84242805911cafc6519aaf58d09e0ae4eb1fc1cd"
+url = "https://github.com/github/copilot-cli/releases/download/v1.0.73/copilot-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/github/copilot-cli/releases/assets/484054948"
+
+[tools.copilot."platforms.linux-x64"]
+checksum = "sha256:8f9bb5f7e364c267265d1e24ac2aea69ed559ddb956719c6db12a353de6c5970"
+url = "https://github.com/github/copilot-cli/releases/download/v1.0.73/copilot-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/github/copilot-cli/releases/assets/484054996"
+
+[tools.copilot."platforms.linux-x64-musl"]
+checksum = "sha256:8f9bb5f7e364c267265d1e24ac2aea69ed559ddb956719c6db12a353de6c5970"
+url = "https://github.com/github/copilot-cli/releases/download/v1.0.73/copilot-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/github/copilot-cli/releases/assets/484054996"
+
+[tools.copilot."platforms.macos-arm64"]
+checksum = "sha256:858081270a544c396af0132926449f8d92ba5086c2b802c633a376a9da5e83d6"
+url = "https://github.com/github/copilot-cli/releases/download/v1.0.73/copilot-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/github/copilot-cli/releases/assets/484054953"
+
+[tools.copilot."platforms.macos-x64"]
+checksum = "sha256:91f9420cd903e35a235407fa87901493625267f502dd3e5d2eab1882b0a8c658"
+url = "https://github.com/github/copilot-cli/releases/download/v1.0.73/copilot-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/github/copilot-cli/releases/assets/484054947"
+
+[tools.copilot."platforms.windows-x64"]
+checksum = "sha256:a60699797c819d38669ac751eb9ad401f3bd416423c6936dc5fad2f6f158f09e"
+url = "https://github.com/github/copilot-cli/releases/download/v1.0.73/copilot-win32-x64.zip"
+url_api = "https://api.github.com/repos/github/copilot-cli/releases/assets/484054949"
+
 [[tools.fnox]]
 version = "1.31.0"
 backend = "github:jdx/fnox"
