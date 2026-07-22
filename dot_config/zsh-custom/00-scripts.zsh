@@ -10,9 +10,9 @@
 #     message
 # HELP
 # )" 1 "$@" || return 0
-#   
+#
 #   # ... function code
-# } 
+# }
 _show_help() {
   if [[ "$3" == "-h" ]] || [[ "$3" == "--help" ]] || [[ "$2" == "1" && "$#" -lt 3 ]]; then
     echo "$1"
@@ -37,7 +37,7 @@ Usage:
   git_merged show|delete local|remote|all
 
   git_merged show all
-  
+
   # nothing unusual there?
   # (Or, if you have other intends, run the output of the above command through xargs...)
 
@@ -132,9 +132,9 @@ aws-logins() {
   # Configuration
   local AWS_REGION="${AWS_REGION:-eu-west-1}"
   local ECR_REGISTRY="${1:-952653322924.dkr.ecr.eu-west-1.amazonaws.com}"
-  
+
   echo "🔐 Starting AWS ECR login process..."
-  
+
   # Step 1: Check if AWS SSO session is still valid
   echo "\n📝 Step 1: Checking AWS SSO session"
   if aws sts get-caller-identity &> /dev/null; then
@@ -148,17 +148,17 @@ aws-logins() {
     fi
     echo "✅ AWS SSO login successful"
   fi
-  
+
   # Get ECR password
   echo "\n🔑 Retrieving ECR credentials..."
   local ECR_PASSWORD
   ECR_PASSWORD=$(aws ecr get-login-password --region "$AWS_REGION")
-  
+
   if [ -z "$ECR_PASSWORD" ]; then
     echo "❌ Failed to retrieve ECR password"
     return 1
   fi
-  
+
   # Step 2: Helm registry login
   echo "\n📦 Step 2: Helm registry login"
   if echo "$ECR_PASSWORD" | helm registry login \
@@ -168,7 +168,7 @@ aws-logins() {
   else
     echo "⚠️  Helm registry login failed"
   fi
-  
+
   # Step 3: Skopeo login
   echo "\n🐙 Step 3: Skopeo login"
   if echo "$ECR_PASSWORD" | skopeo login \
@@ -178,10 +178,10 @@ aws-logins() {
   else
     echo "⚠️  Skopeo login failed"
   fi
-  
+
   # Step 4: Podman login
   echo "\n🦭 Step 4: Podman login"
-  
+
   # Check if podman machine is running
   if command -v podman &> /dev/null; then
     if podman machine list 2>/dev/null | grep -q "Currently running"; then
@@ -190,7 +190,7 @@ aws-logins() {
       echo "⚠️  Podman machine is not running. Starting it..."
       podman machine start
     fi
-    
+
     if echo "$ECR_PASSWORD" | podman login \
         --username AWS \
         --password-stdin "$ECR_REGISTRY"; then
@@ -201,7 +201,7 @@ aws-logins() {
   else
     echo "⚠️  Podman not found, skipping..."
   fi
-  
+
   # Step 5: Crane login
   echo "\n🏗️  Step 5: Crane login"
   if command -v crane &> /dev/null; then
@@ -215,6 +215,6 @@ aws-logins() {
   else
     echo "⚠️  Crane not found, skipping..."
   fi
-  
+
   echo "\n✨ AWS ECR login process completed!"
 }

@@ -1,5 +1,5 @@
 # Create this bundle by combining a suitable root certificate bundle with the zscaler root certificate
-# 
+#
 # Using brew, probably this bundle exists:
 #    openssl storeutl -noout -text -certs /opt/homebrew/etc/ca-certificates/cert.pem
 # From zscaler, probably this certificate exists:
@@ -12,7 +12,7 @@
 # completed with zscaler root cert. To verify:
 #
 #   openssl storeutl -noout -text /opt/homebrew/etc/ca-certificates/cert.pem 2>/dev/null | grep -A2 "Zscaler"
-# 
+#
 # To trigger re-creation of the ca-certificates bundle:
 #
 #   brew reinstall ca-certificates

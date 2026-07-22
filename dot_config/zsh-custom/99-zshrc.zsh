@@ -71,7 +71,7 @@ alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
 # shortcuts
 # CUHD: CUrl Header Dump (array, expanded into multiple args, not a single arg)
-export CUHD=(-s -D - -o /dev/null)  
+export CUHD=(-s -D - -o /dev/null)
 # CUAD: CUrl Akamai Debug (most common debug headers)
 # CUADF: CUrl Akamai Debug Full (all debug headers)
 export CUAD=(-H "x-dpgm-akdebug-unhide: $DPG_AKAMAI_UNHIDE" -H "pragma: akamai-x-im-trace, akamai-x-cache-on, akamai-x-cache-remote-on, akamai-x-check-cacheable, akamai-x-get-cache-key, akamai-x-get-true-cache-key, akamai-x-serial-no, akamai-x-get-request-id, akamai-x-get-client-ip")

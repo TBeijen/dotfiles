@@ -13,7 +13,7 @@
 if [[ "${USE_FNOX_CREDS:-false}" == "true" ]]; then
   export AWS_SHARED_CREDENTIALS_FILE="$HOME/.aws/fnox-credentials"
 fi
- 
+
 # Drop into a subshell with fnox creds active, without touching the current shell.
 # Useful when current shell uses normal AWS workflow and you just want to try fnox.
 #   fnox-shell

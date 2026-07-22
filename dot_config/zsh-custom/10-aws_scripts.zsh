@@ -12,7 +12,7 @@ aws_login() {
 
 # Lookup EC2 instance ip.
 #
-# Usage: 
+# Usage:
 #   aws_ip <Instance_Id>
 #   ssh $(aws_ip <Instance_Id>)
 aws_ip() {
@@ -31,7 +31,7 @@ aws_asg_list() {
 # List instances of auto scaling group.
 # Optionally sets desired capacity.
 #
-# Usage: 
+# Usage:
 #   aws_asg_instances <ASG_Name>
 #   aws_asg_instances <ASG_Name> <Number_Of_Instances>
 aws_asg_instances() {
@@ -91,7 +91,7 @@ Display bucket size and object count using Cloudwatch.
 Usage:
   aws_s3_bucket_size <bucket-name>
 HELP
-)" 1 "$@" || return 0 
+)" 1 "$@" || return 0
 
   # See: https://serverfault.com/questions/84815/how-can-i-get-the-size-of-an-amazon-s3-bucket
   BUCKET=$1
@@ -126,7 +126,7 @@ HELP
 
   echo "Logging in into ${ECR_REPOSITORY} (using ${DOCKER_BINARY})"
   aws ecr get-login-password | ${DOCKER_BINARY} login --password-stdin --username AWS ${ECR_REPOSITORY}
-} 
+}
 
 aws_ec2_find() {
   _show_help "$(cat <<-HELP
@@ -169,7 +169,7 @@ HELP
   local short="$2"
 
   aws eks update-kubeconfig --dry-run --name "$cluster" --alias "$short" | \
-    yq 'del(.users[].user.exec.env)' 
+    yq 'del(.users[].user.exec.env)'
     # | \
     # yq ".clusters[].name = \"$short\""
 }
@@ -203,7 +203,7 @@ HELP
 
 
 # Set AWS profile
-# 
+#
 # Usage:
 #   aws_set_profile <Config_Profile>
 #   aws_set_profile sandbox
@@ -222,7 +222,7 @@ aws_set_profile() {
 }
 
 # List available AWS profiles
-# 
+#
 # Usage:
 #   aws_get_profiles
 aws_get_profiles() {

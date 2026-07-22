@@ -21,7 +21,7 @@
 #
 # Open SSH Connection
 #   ssh <INSTANCE_USER>@<INSTANCE_ID>
-#   
+#
 #   Ensure AWS CLI environment variables are set properly
 #   e.g. AWS_PROFILE='default' ssh ec2-user@i-xxxxxxxxxxxxxxxx
 #
@@ -53,12 +53,12 @@ aws ssm send-command \
   --comment "Add an SSH public key to authorized_keys for ${ssh_public_key_timeout} seconds" \
   --parameters commands="\"
     mkdir -p ~${ssh_user}/.ssh && cd ~${ssh_user}/.ssh || exit 1
-    
+
     authorized_key='${ssh_public_key} ssm-session'
     echo \\\"\${authorized_key}\\\" >> authorized_keys
-    
+
     sleep ${ssh_public_key_timeout}
-    
+
     grep -v -F \\\"\${authorized_key}\\\" authorized_keys > .authorized_keys
     mv .authorized_keys authorized_keys
   \""
