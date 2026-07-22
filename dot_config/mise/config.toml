@@ -13,3 +13,9 @@ starship = "1"
 [settings]
 lockfile = true
 experimental = true
+# Supply-chain quarantine: ignore releases younger than this window, so a
+# hijacked/typosquatted publish has time to be caught before I resolve it.
+# Explicit override of mise's 24h default (24h is too short to matter).
+# Delays legit security patches too — use minimum_release_age_excludes to
+# fast-track specific trusted tools if that ever bites.
+minimum_release_age = "7d"
