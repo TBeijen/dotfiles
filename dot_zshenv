@@ -1,0 +1,2 @@
+# Make mise-managed tools available in non-interactive shells (scripts, subprocesses, git hooks)
+export PATH="$HOME/.local/share/mise/shims:$PATH"
