@@ -1,7 +1,9 @@
 [tools]
+bun = "latest"
 # Intent-level constraints. Exact versions + checksums live in mise.lock.
 claude = "2"
 copilot = "latest"
+cosign = "latest"
 fnox = "1"
 git-filter-repo = "latest"
 jq = "1"

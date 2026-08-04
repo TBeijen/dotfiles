@@ -2,6 +2,9 @@
 
 # Run `mise up -i` (interactive tool version updates), then re-sync the global
 # mise config + lockfile into chezmoi source, and optionally commit + push.
+# Alternative: `mise up -i && chezmoi re-add` with chezmoi git.autoAdd/autoCommit/autoPush
+# configured in .chezmoi.toml — but those lack a per-invocation opt-out.
+# See also `chezmoi git -- <args>` to run git commands in the source dir without cd'ing.
 #
 # Usage: mise-up [<mise up args>]
 # Examples:

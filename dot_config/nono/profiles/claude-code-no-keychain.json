@@ -2,7 +2,7 @@
   "extends": "default",
   "meta": {
     "name": "claude-code-no-keychain",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Claude Code base profile without Keychain access (forked from always-further/claude)"
   },
   "groups": {
@@ -28,6 +28,7 @@
   "filesystem": {
     "allow": [
       "$HOME/.claude",
+      "$HOME/.cc-writes",
       "$HOME/.cache/claude",
       "$HOME/.config/nono/profiles",
       "/tmp/claude-$UID"

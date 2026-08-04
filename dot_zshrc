@@ -118,3 +118,6 @@ export PATH="$PATH:$HOME/.docker/bin"
 
 # Profile end (comment to disable)
 # zprof
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/tbeijen01/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
