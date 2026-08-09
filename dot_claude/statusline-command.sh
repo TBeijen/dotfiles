@@ -68,6 +68,12 @@ if [ -n "$cost_usd" ]; then
   cost_part=$(printf '$%.3f' "$cost_usd")
 fi
 
+# -- Nono sandbox --
+nono_part=""
+if [ -n "$NONO_CAP_FILE" ]; then
+  nono_part="🔒"
+fi
+
 # -- Assemble with ANSI colors (dimmed-friendly) --
 # cyan for path, default for git, dim for model/ctx
 reset="\033[0m"
@@ -77,8 +83,13 @@ dim="\033[2m"
 
 parts=""
 
+# nono indicator
+if [ -n "$nono_part" ]; then
+  parts="${nono_part} "
+fi
+
 # path
-parts="${cyan}${dir_part}${reset}"
+parts="${parts}${cyan}${dir_part}${reset}"
 
 # git
 if [ -n "$git_part" ]; then

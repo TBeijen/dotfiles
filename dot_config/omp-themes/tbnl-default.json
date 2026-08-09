@@ -52,6 +52,15 @@
           ]
         },
         {
+          "leading_diamond": "<transparent,p:green>\ue0b0</>",
+          "trailing_diamond": "\ue0b0",
+          "template": "{{ if .Env.NONO_CAP_FILE }} \uf023 {{ end }}",
+          "foreground": "p:black",
+          "background": "p:green",
+          "type": "text",
+          "style": "diamond"
+        },
+        {
           "options": {
             "time_format": "15:04 | Mon"
           },
