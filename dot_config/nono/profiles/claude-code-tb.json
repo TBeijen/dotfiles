@@ -1,4 +1,5 @@
 {
+  "$schema": "./nono-profile.schema.json",
   "meta": {
     "name": "claude-code-tb",
     "version": "1.0.0",

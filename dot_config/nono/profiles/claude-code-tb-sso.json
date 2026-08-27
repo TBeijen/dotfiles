@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "name": "claude-code-tb-sso",
+    "version": "1.0.0",
+    "description": "Claude Code customization for TB, using SSO"
+  },
+  "extends": "claude-code-no-keychain",
+  "env_credentials": {
+    "apple-password://github.com/nono-dpg-tbeijen-pat-claude": "GH_TOKEN"
+  },
+  "credential_providers": {
+    "claude_code": {
+      "type": "oauth_capture",
+      "token_endpoints": [
+        {
+          "host": "https://platform.claude.com",
+          "path": "/v1/oauth/token",
+          "response_fields": [
+            { "path": "access_token", "kind": "opaque" },
+            { "path": "refresh_token", "kind": "opaque" }
+          ],
+          "request_body": "auto",
+          "request_nonce_fields": ["refresh_token"]
+        }
+      ],
+      "api_hosts": [
+        "https://api.anthropic.com"
+      ],
+      "helpers": {
+        "status": ["claude", "auth", "status", "--json"],
+        "login": ["claude", "auth", "login"],
+        "logout": ["claude", "auth", "logout"]
+      }
+    }
+  },
+  "credential_routes": [
+    {
+      "name": "claude_code_oauth",
+      "provider": "claude_code"
+    }
+  ],
+  "groups": {
+    "include": [
+      "deny_credentials",
+      "deny_keychains_macos"
+    ]
+  },
+  "filesystem": {
+    "read": [
+      "$HOME/.config/gh",
+      "$HOME/dotfiles"
+    ],
+    "read_file": [
+      "$HOME/.zscaler/bundle_combined.pem",
+      "$HOME/.gitconfig-dpg"
+    ]
+  },
+  "network": { "block": false, "listen_port_range": [[49152, 65535]] }
+}

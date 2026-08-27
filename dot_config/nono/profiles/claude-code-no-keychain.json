@@ -1,4 +1,5 @@
 {
+  "$schema": "./nono-profile.schema.json",
   "extends": "default",
   "meta": {
     "name": "claude-code-no-keychain",
@@ -10,6 +11,7 @@
       "claude_code_linux",
       "user_caches_macos",
       "claude_cache_linux",
+      "go_runtime",
       "node_runtime",
       "rust_runtime",
       "python_runtime",
@@ -44,16 +46,28 @@
       "$HOME/.claude.lock"
     ]
   },
-  "network": { "block": false },
-  "workdir": { "access": "readwrite" },
+  "network": {
+    "block": false
+  },
+  "workdir": {
+    "access": "readwrite"
+  },
   "open_urls": {
-    "allow_origins": ["https://claude.ai"],
+    "allow_origins": [
+      "https://claude.ai"
+    ],
     "allow_localhost": true
   },
   "allow_launch_services": true,
   "undo": {
-    "exclude_patterns": ["node_modules", ".next", "__pycache__", "target"],
-    "exclude_globs": ["*.tmp.[0-9]*.[0-9]*"]
-  },
-  "interactive": true
+    "exclude_patterns": [
+      "node_modules",
+      ".next",
+      "__pycache__",
+      "target"
+    ],
+    "exclude_globs": [
+      "*.tmp.[0-9]*.[0-9]*"
+    ]
+  }
 }

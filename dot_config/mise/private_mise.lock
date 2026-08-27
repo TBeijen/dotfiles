@@ -468,6 +468,65 @@ url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-win-x64.zip"
 checksum = "sha256:d3b2277dbcccfdf24ef6302928f64f484cff1d77a6d3caa3a28f4d20ce9158f6"
 url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-win-x64.zip"
 
+[[tools.nono]]
+version = "0.73.0"
+backend = "github:nolabs-ai/nono"
+
+[tools.nono."platforms.linux-arm64"]
+checksum = "sha256:8930dfbf25b5b3a2b8753d37cd98ba4263e117f9c7a4098f4d4dda230715a797"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944154"
+provenance = "github-attestations"
+
+[tools.nono."platforms.linux-arm64-musl"]
+checksum = "sha256:8930dfbf25b5b3a2b8753d37cd98ba4263e117f9c7a4098f4d4dda230715a797"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944154"
+provenance = "github-attestations"
+
+[tools.nono."platforms.linux-x64"]
+checksum = "sha256:ee3a5c4fb7be0b8517074cdb597a7c5ea19d48845d596d0fd49561e586ded2a8"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944163"
+provenance = "github-attestations"
+
+[tools.nono."platforms.linux-x64-baseline"]
+checksum = "sha256:ee3a5c4fb7be0b8517074cdb597a7c5ea19d48845d596d0fd49561e586ded2a8"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944163"
+provenance = "github-attestations"
+
+[tools.nono."platforms.linux-x64-musl"]
+checksum = "sha256:975d31a78cb35267fd4b0a8303f05adcaad827928734e38f0fde3d4e59e1ce1e"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944155"
+provenance = "github-attestations"
+
+[tools.nono."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:975d31a78cb35267fd4b0a8303f05adcaad827928734e38f0fde3d4e59e1ce1e"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944155"
+provenance = "github-attestations"
+
+[tools.nono."platforms.macos-arm64"]
+checksum = "sha256:f17afb66cc513506efea26da583be92d2235bb9467664c21c268f0c4592a7c65"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944156"
+provenance = "github-attestations"
+provenance_verified = true
+
+[tools.nono."platforms.macos-x64"]
+checksum = "sha256:64795d8d945e43dfa9d4283df78379395cff8a1be0f98a4afcc8c8759c4d9f91"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944159"
+provenance = "github-attestations"
+
+[tools.nono."platforms.macos-x64-baseline"]
+checksum = "sha256:64795d8d945e43dfa9d4283df78379395cff8a1be0f98a4afcc8c8759c4d9f91"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944159"
+provenance = "github-attestations"
+
 [[tools.python]]
 version = "3.14.6"
 backend = "core:python"

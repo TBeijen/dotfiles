@@ -9,6 +9,7 @@ git-filter-repo = "latest"
 jq = "1"
 kubectl = "1.34"
 node = "26"
+nono = "latest"
 python = "3.14"
 starship = "1"
 
