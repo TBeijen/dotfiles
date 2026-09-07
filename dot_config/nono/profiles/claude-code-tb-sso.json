@@ -55,5 +55,13 @@
       "$HOME/.gitconfig-dpg"
     ]
   },
-  "network": { "block": false, "listen_port_range": [[49152, 65535]] }
+  "network": {
+    "block": false,
+    "network_profile": "developer",
+    "listen_port_range": [[49152, 65535]],
+    "allow_domain": [
+      "nono.sh",
+      "dag-andersen.github.io"
+    ]
+  }
 }

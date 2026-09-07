@@ -10,6 +10,7 @@ jq = "1"
 kubectl = "1.34"
 node = "26"
 nono = "latest"
+"pipx:yubikey-manager" = "latest"
 python = "3.14"
 starship = "1"
 

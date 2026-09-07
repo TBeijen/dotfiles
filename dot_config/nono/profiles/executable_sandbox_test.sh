@@ -67,5 +67,7 @@ assert_path_allowed() {
 
 assert_path_denied ~/.aws
 assert_path_denied ~/.ssh
+assert_path_denied ~/Documents
+assert_path_denied ~/Downloads
 
 summary
