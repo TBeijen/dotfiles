@@ -4,10 +4,7 @@
     "version": "1.0.0",
     "description": "Claude Code customization for TB, using SSO"
   },
-  "extends": "claude-code-no-keychain",
-  "env_credentials": {
-    "apple-password://github.com/nono-dpg-tbeijen-pat-claude": "GH_TOKEN"
-  },
+  "extends": "claude-code-tb-base-no-keychain",
   "credential_providers": {
     "claude_code": {
       "type": "oauth_capture",
@@ -39,29 +36,12 @@
       "provider": "claude_code"
     }
   ],
-  "groups": {
-    "include": [
-      "deny_credentials",
-      "deny_keychains_macos"
-    ]
-  },
-  "filesystem": {
-    "read": [
-      "$HOME/.config/gh",
-      "$HOME/dotfiles"
+  "open_urls": {
+    "allow_origins": [
+      "https://claude.ai",
+      "https://claude.com"
     ],
-    "read_file": [
-      "$HOME/.zscaler/bundle_combined.pem",
-      "$HOME/.gitconfig-dpg"
-    ]
+    "allow_localhost": true
   },
-  "network": {
-    "block": false,
-    "network_profile": "developer",
-    "listen_port_range": [[49152, 65535]],
-    "allow_domain": [
-      "nono.sh",
-      "dag-andersen.github.io"
-    ]
-  }
+  "allow_launch_services": true
 }

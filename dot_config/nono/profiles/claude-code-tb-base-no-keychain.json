@@ -1,0 +1,104 @@
+{
+  "$schema": "./nono-profile.schema.json",
+  "extends": "default",
+  "meta": {
+    "name": "claude-code-tb-base-no-keychain",
+    "version": "1.1.0",
+    "description": "Claude Code base profile without Keychain access (forked from always-further/claude)"
+  },
+  "groups": {
+    "include": [
+      "claude_code_linux",
+      "user_caches_macos",
+      "claude_cache_linux",
+      "go_runtime",
+      "node_runtime",
+      "rust_runtime",
+      "python_runtime",
+      "vscode_macos",
+      "vscode_linux",
+      "linux_sysfs_read",
+      "nix_runtime",
+      "git_config",
+      "unlink_protection",
+      "deny_credentials",
+      "deny_keychains_macos"
+    ]
+  },
+  "security": {
+    "signal_mode": "isolated",
+    "capability_elevation": false
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.claude",
+      "$HOME/.cc-writes",
+      "$HOME/.cache/claude",
+      "$HOME/.config/nono/profiles",
+      "/tmp/claude-$UID"
+    ],
+    "allow_file": [
+      "$HOME/.claude.json",
+      "$HOME/.claude.json.lock",
+      "$HOME/.claude.lock"
+    ],
+    "read": [
+      "$HOME/.config/gh",
+      "$HOME/dotfiles",
+      "$HOME/.config/nono/packages",
+      "$HOME/.local/share/claude",
+      "$HOME/Applications/Claude Code URL Handler.app"
+    ],
+    "read_file": [
+      "$HOME/.zscaler/bundle_combined.pem",
+      "$HOME/.gitconfig-dpg",
+      "$HOME/.ssh/dpg_id_ed25519_sign",
+      "$HOME/.ssh/id_ed25519_sign"
+    ]
+  },
+  "workdir": {
+    "access": "readwrite"
+  },
+  "undo": {
+    "exclude_patterns": [
+      "node_modules",
+      ".next",
+      "__pycache__",
+      "target"
+
+    ],
+    "exclude_globs": [
+      "*.tmp.[0-9]*.[0-9]*"
+    ]
+  },
+  // "env_credentials": {
+  //   "apple-password://github.com/github-pat-dpg-readonly": "GH_TOKEN"
+  // },
+  "network": {
+    "block": false,
+    "network_profile": "developer",
+    "listen_port_range": [[49152, 65535]],
+    "allow_domain": [
+      "dag-andersen.github.io",
+      "fnox.dev"
+      "kubernetes.io",
+      "nono.sh"
+    ],
+    "tls_intercept": {
+      "ca_env_vars": ["GH_SSL_CERT_FILE"]
+    }
+    // "credentials": ["github"],
+    // "custom_credentials": {
+    //   "github": {
+    //     "upstream": "https://api.github.com",
+    //     "credential_key": "apple-password://github.com/github-pat-dpg-readonly",
+    //     "env_var": "GH_TOKEN",
+    //     "inject_header": "Authorization",
+    //     "credential_format": "token {}",
+    //     "endpoint_rules": [
+    //       { "method": "GET", "path": "/**" }
+    //     ]
+    //   }
+    // }
+  }
+}
