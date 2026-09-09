@@ -35,6 +35,7 @@
       "$HOME/.cc-writes",
       "$HOME/.cache/claude",
       "$HOME/.config/nono/profiles",
+      "$HOME/projects",
       "/tmp/claude-$UID"
     ],
     "allow_file": [
@@ -47,6 +48,7 @@
       "$HOME/dotfiles",
       "$HOME/.config/nono/packages",
       "$HOME/.local/share/claude",
+      "$HOME/.local/share/mise",
       "$HOME/Applications/Claude Code URL Handler.app"
     ],
     "read_file": [
@@ -78,11 +80,42 @@
     "block": false,
     "network_profile": "developer",
     "listen_port_range": [[49152, 65535]],
+    "open_port": [
+      3030,
+      5000,
+      8080,
+      8931
+    ],
     "allow_domain": [
       "dag-andersen.github.io",
-      "fnox.dev"
+      "fnox.dev",
       "kubernetes.io",
-      "nono.sh"
+      // Used for local slidev mcp. Be aware of other services or port-forwards.
+      "localhost",
+      "nono.sh",
+      // GHA logs
+      // See: https://github.com/orgs/community/discussions/46211#discussioncomment-16360258
+      "productionresultssa0.blob.core.windows.net",
+      "productionresultssa1.blob.core.windows.net",
+      "productionresultssa2.blob.core.windows.net",
+      "productionresultssa3.blob.core.windows.net",
+      "productionresultssa4.blob.core.windows.net",
+      "productionresultssa5.blob.core.windows.net",
+      "productionresultssa6.blob.core.windows.net",
+      "productionresultssa7.blob.core.windows.net",
+      "productionresultssa8.blob.core.windows.net",
+      "productionresultssa9.blob.core.windows.net",
+      "productionresultssa10.blob.core.windows.net",
+      "productionresultssa11.blob.core.windows.net",
+      "productionresultssa12.blob.core.windows.net",
+      "productionresultssa13.blob.core.windows.net",
+      "productionresultssa14.blob.core.windows.net",
+      "productionresultssa15.blob.core.windows.net",
+      "productionresultssa16.blob.core.windows.net",
+      "productionresultssa17.blob.core.windows.net",
+      "productionresultssa18.blob.core.windows.net",
+      "productionresultssa19.blob.core.windows.net",
+      "sli.dev"
     ],
     "tls_intercept": {
       "ca_env_vars": ["GH_SSL_CERT_FILE"]
