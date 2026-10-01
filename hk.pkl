@@ -7,11 +7,23 @@ local linters = new Mapping<String, Step> {
     ["newlines"] = Builtins.newlines
 }
 
+local commitLinters = new Mapping<String, Step> {
+    ["gitleaks"] = Builtins.gitleaks
+    ["trailing_whitespace"] = new Step {
+        types = List("text")
+        check = "hk util trailing-whitespace --diff {{files}} >&2 || { echo 'WARNING: trailing whitespace found; run hk fix to remove it.' >&2; true; }"
+    }
+    ["newlines"] = new Step {
+        types = List("text")
+        check = "hk util end-of-file-fixer --diff {{files}} >&2 || { echo 'WARNING: missing final newline; run hk fix to add it.' >&2; true; }"
+    }
+}
+
 hooks {
     ["pre-commit"] {
-        fix = true          // auto-fix whitespace/newlines, re-stage
+        fix = false         // warn about whitespace/newlines without changing files
         stash = "git"       // stash unstaged changes during run
-        steps = linters
+        steps = commitLinters
     }
     ["pre-push"] {
         steps = linters     // backstop: secret scan before push
