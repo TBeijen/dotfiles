@@ -62,7 +62,7 @@
   "workdir": {
     "access": "readwrite"
   },
-  "undo": {
+  "rollback": {
     "exclude_patterns": [
       "node_modules",
       ".next",
