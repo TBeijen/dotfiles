@@ -313,6 +313,55 @@ backend = "gem:tmuxinator"
 version = "2.47.0"
 backend = "pipx:git-filter-repo"
 
+[[tools."github:TBeijen/sworkspace"]]
+version = "0.1.0"
+backend = "github:TBeijen/sworkspace"
+
+[tools."github:TBeijen/sworkspace"."platforms.linux-arm64"]
+checksum = "sha256:1e4e7b1603e65461d8c0d6c5f2bea1beaf0939730b298c248cc5be854d216bed"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461202"
+
+[tools."github:TBeijen/sworkspace"."platforms.linux-arm64-musl"]
+checksum = "sha256:1e4e7b1603e65461d8c0d6c5f2bea1beaf0939730b298c248cc5be854d216bed"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461202"
+
+[tools."github:TBeijen/sworkspace"."platforms.linux-x64"]
+checksum = "sha256:a279b8a5455b0a314c057cc2258029fc5fd72a74bf3e2990da9275b9dff6dce7"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461198"
+
+[tools."github:TBeijen/sworkspace"."platforms.linux-x64-baseline"]
+checksum = "sha256:a279b8a5455b0a314c057cc2258029fc5fd72a74bf3e2990da9275b9dff6dce7"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461198"
+
+[tools."github:TBeijen/sworkspace"."platforms.linux-x64-musl"]
+checksum = "sha256:a279b8a5455b0a314c057cc2258029fc5fd72a74bf3e2990da9275b9dff6dce7"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461198"
+
+[tools."github:TBeijen/sworkspace"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:a279b8a5455b0a314c057cc2258029fc5fd72a74bf3e2990da9275b9dff6dce7"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461198"
+
+[tools."github:TBeijen/sworkspace"."platforms.macos-arm64"]
+checksum = "sha256:f40b163c891ebfd377ddeefe7aaf582424d94244ee23695b3c1c47470c77f1a0"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461193"
+
+[tools."github:TBeijen/sworkspace"."platforms.macos-x64"]
+checksum = "sha256:1d2c1a5011ede57634c05368a08f3b2ae1fcc2743bad15afa7c2628d700c0481"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-darwin-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461199"
+
+[tools."github:TBeijen/sworkspace"."platforms.macos-x64-baseline"]
+checksum = "sha256:1d2c1a5011ede57634c05368a08f3b2ae1fcc2743bad15afa7c2628d700c0481"
+url = "https://github.com/TBeijen/sworkspace/releases/download/v0.1.0/sworkspace-darwin-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/sworkspace/releases/assets/602461199"
+
 [[tools.jq]]
 version = "1.8.2"
 backend = "aqua:jqlang/jq"

@@ -49,6 +49,7 @@
       "$HOME/.config/nono/packages",
       "$HOME/.local/share/claude",
       "$HOME/.local/share/mise",
+      "$HOME/.local/state/mise",
       "$HOME/Applications/Claude Code URL Handler.app"
     ],
     "read_file": [
@@ -90,6 +91,8 @@
       "dag-andersen.github.io",
       "fnox.dev",
       "kubernetes.io",
+      "marketplace.upbound.io",
+      "mise.jdx.dev",
       // Used for local slidev mcp. Be aware of other services or port-forwards.
       "localhost",
       "nono.sh",
