@@ -236,74 +236,63 @@ url_api = "https://api.github.com/repos/sigstore/cosign/releases/assets/48049721
 provenance = "cosign"
 
 [[tools.fnox]]
-version = "1.31.0"
-backend = "github:jdx/fnox"
+version = "1.36.0"
+backend = "packslip:github.com/jdx/fnox"
 
 [tools.fnox."platforms.linux-arm64"]
-checksum = "sha256:627f93c5fac35c08f613415e25904ed6775c50e19bc8e9c6d61fe5d02014635d"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276465"
-provenance = "github-attestations"
+checksum = "sha256:a479fc6cdf52db7ec5fab8027e62debbbe7ee18f2829bcdcc4766c9dc3ef123e"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-aarch64-unknown-linux-gnu.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.linux-arm64-musl"]
-checksum = "sha256:779d2cb7bcefa81d57e269bfd5ffdf39ca961d526b06cfb35b7aa670b35c1c6a"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276463"
-provenance = "github-attestations"
+checksum = "sha256:1d7f21441c6dfb23fe9e27c4eed98d821c8e7f8587a7040c8f7471c79c3ed76f"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-aarch64-unknown-linux-musl.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.linux-x64"]
-checksum = "sha256:5cfc8f5746e44188418174fd8338ffcbf22531626a439d166ec81b20203ea520"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276475"
-provenance = "github-attestations"
+checksum = "sha256:9c4f4dd2ae9b704016798eef18e74fecb61f954cabb8ec4b97f848332954463d"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-unknown-linux-gnu.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.linux-x64-baseline"]
-checksum = "sha256:5cfc8f5746e44188418174fd8338ffcbf22531626a439d166ec81b20203ea520"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276475"
-provenance = "github-attestations"
+checksum = "sha256:9c4f4dd2ae9b704016798eef18e74fecb61f954cabb8ec4b97f848332954463d"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-unknown-linux-gnu.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.linux-x64-musl"]
-checksum = "sha256:d226e10cb1698c2ad05a20ee96269460d9b1ba7b4cc29f0691e9b5a0a78d7aee"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276476"
-provenance = "github-attestations"
+checksum = "sha256:4cc3b4e82d6be720078f723280a8cb918429c555aa54232be245b79440869f99"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-unknown-linux-musl.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:d226e10cb1698c2ad05a20ee96269460d9b1ba7b4cc29f0691e9b5a0a78d7aee"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276476"
-provenance = "github-attestations"
+checksum = "sha256:4cc3b4e82d6be720078f723280a8cb918429c555aa54232be245b79440869f99"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-unknown-linux-musl.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.macos-arm64"]
-checksum = "sha256:a4f7b576ce0a4ba5d3075db59dc0c2f0749f6fa6d8a08f2b546588d3bf96b44c"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276462"
-provenance = "github-attestations"
+checksum = "sha256:b1de28349089d62b24518f1a6103005f9f3c82aaf5ca7872e65bf3fc349e4166"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-aarch64-apple-darwin.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.macos-x64"]
-checksum = "sha256:4351a40b6f0649ab4b6a5d1b870d60d2b2d684b66b91bb78ecac0f4b278d6cbe"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276464"
-provenance = "github-attestations"
+checksum = "sha256:7b380fd18e802da6246485f64289b66d121c2b42e1df8b017015d07be32ad9b5"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-apple-darwin.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.macos-x64-baseline"]
-checksum = "sha256:4351a40b6f0649ab4b6a5d1b870d60d2b2d684b66b91bb78ecac0f4b278d6cbe"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276464"
-provenance = "github-attestations"
+checksum = "sha256:7b380fd18e802da6246485f64289b66d121c2b42e1df8b017015d07be32ad9b5"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-apple-darwin.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.windows-x64"]
-checksum = "sha256:eaeb77b5411f078900600b353b3291492eb92888af03be332315c4aa4c46baf6"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276474"
-provenance = "github-attestations"
+checksum = "sha256:49f74e04d4700ced13842ea49ae23bfeac4dd75dede35e3784c704895bddcf9a"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-pc-windows-msvc.zip"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [tools.fnox."platforms.windows-x64-baseline"]
-checksum = "sha256:eaeb77b5411f078900600b353b3291492eb92888af03be332315c4aa4c46baf6"
-url = "https://github.com/jdx/fnox/releases/download/v1.31.0/fnox-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/jdx/fnox/releases/assets/480276474"
-provenance = "github-attestations"
+checksum = "sha256:49f74e04d4700ced13842ea49ae23bfeac4dd75dede35e3784c704895bddcf9a"
+url = "https://github.com/jdx/fnox/releases/download/v1.36.0/fnox-x86_64-pc-windows-msvc.zip"
+signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [[tools."gem:tmuxinator"]]
 version = "3.4.1"
@@ -522,62 +511,61 @@ checksum = "sha256:d3b2277dbcccfdf24ef6302928f64f484cff1d77a6d3caa3a28f4d20ce915
 url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-win-x64.zip"
 
 [[tools.nono]]
-version = "0.73.0"
+version = "0.78.0"
 backend = "github:nolabs-ai/nono"
 
 [tools.nono."platforms.linux-arm64"]
-checksum = "sha256:8930dfbf25b5b3a2b8753d37cd98ba4263e117f9c7a4098f4d4dda230715a797"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944154"
+checksum = "sha256:7308b4109940f16ec0d024eb4bbcface1cfe2ea1e8333dd147ab4f0be7706071"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264594"
 provenance = "github-attestations"
 
 [tools.nono."platforms.linux-arm64-musl"]
-checksum = "sha256:8930dfbf25b5b3a2b8753d37cd98ba4263e117f9c7a4098f4d4dda230715a797"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944154"
+checksum = "sha256:7308b4109940f16ec0d024eb4bbcface1cfe2ea1e8333dd147ab4f0be7706071"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264594"
 provenance = "github-attestations"
 
 [tools.nono."platforms.linux-x64"]
-checksum = "sha256:ee3a5c4fb7be0b8517074cdb597a7c5ea19d48845d596d0fd49561e586ded2a8"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944163"
+checksum = "sha256:af5e837973d547aaf6d3cdfbd12e3952224d1bb77b7292962ea19180399c38db"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264582"
 provenance = "github-attestations"
 
 [tools.nono."platforms.linux-x64-baseline"]
-checksum = "sha256:ee3a5c4fb7be0b8517074cdb597a7c5ea19d48845d596d0fd49561e586ded2a8"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944163"
+checksum = "sha256:af5e837973d547aaf6d3cdfbd12e3952224d1bb77b7292962ea19180399c38db"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264582"
 provenance = "github-attestations"
 
 [tools.nono."platforms.linux-x64-musl"]
-checksum = "sha256:975d31a78cb35267fd4b0a8303f05adcaad827928734e38f0fde3d4e59e1ce1e"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944155"
+checksum = "sha256:4321638e842f803d5cc5000c6e3b1a77ce40fe4f3646a54cc83b286b9d1d0d51"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264579"
 provenance = "github-attestations"
 
 [tools.nono."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:975d31a78cb35267fd4b0a8303f05adcaad827928734e38f0fde3d4e59e1ce1e"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944155"
+checksum = "sha256:4321638e842f803d5cc5000c6e3b1a77ce40fe4f3646a54cc83b286b9d1d0d51"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264579"
 provenance = "github-attestations"
 
 [tools.nono."platforms.macos-arm64"]
-checksum = "sha256:f17afb66cc513506efea26da583be92d2235bb9467664c21c268f0c4592a7c65"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944156"
+checksum = "sha256:ac161b551e14ee6f5dfb4e95593964e9af45db9c9d01074cbe7d6bf4110680b4"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264585"
 provenance = "github-attestations"
-provenance_verified = true
 
 [tools.nono."platforms.macos-x64"]
-checksum = "sha256:64795d8d945e43dfa9d4283df78379395cff8a1be0f98a4afcc8c8759c4d9f91"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944159"
+checksum = "sha256:bae402c90e9d8f25e94e6c21b56e54a674ebfff3fa1bdc3c298e1bfc2f7e82dc"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264583"
 provenance = "github-attestations"
 
 [tools.nono."platforms.macos-x64-baseline"]
-checksum = "sha256:64795d8d945e43dfa9d4283df78379395cff8a1be0f98a4afcc8c8759c4d9f91"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.73.0/nono-v0.73.0-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/508944159"
+checksum = "sha256:bae402c90e9d8f25e94e6c21b56e54a674ebfff3fa1bdc3c298e1bfc2f7e82dc"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264583"
 provenance = "github-attestations"
 
 [[tools."pipx:yubikey-manager"]]
