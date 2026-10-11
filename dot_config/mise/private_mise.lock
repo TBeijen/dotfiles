@@ -512,62 +512,8 @@ checksum = "sha256:9fef7eca6743a6b910989cd8e78712376b394fcb9b6e1e9c44a0799a287f9
 url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-win-x64.zip"
 
 [[tools.nono]]
-version = "0.78.0"
+version = "pr-2088"
 backend = "github:nolabs-ai/nono"
-
-[tools.nono."platforms.linux-arm64"]
-checksum = "sha256:7308b4109940f16ec0d024eb4bbcface1cfe2ea1e8333dd147ab4f0be7706071"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264594"
-provenance = "github-attestations"
-
-[tools.nono."platforms.linux-arm64-musl"]
-checksum = "sha256:7308b4109940f16ec0d024eb4bbcface1cfe2ea1e8333dd147ab4f0be7706071"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264594"
-provenance = "github-attestations"
-
-[tools.nono."platforms.linux-x64"]
-checksum = "sha256:af5e837973d547aaf6d3cdfbd12e3952224d1bb77b7292962ea19180399c38db"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264582"
-provenance = "github-attestations"
-
-[tools.nono."platforms.linux-x64-baseline"]
-checksum = "sha256:af5e837973d547aaf6d3cdfbd12e3952224d1bb77b7292962ea19180399c38db"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264582"
-provenance = "github-attestations"
-
-[tools.nono."platforms.linux-x64-musl"]
-checksum = "sha256:4321638e842f803d5cc5000c6e3b1a77ce40fe4f3646a54cc83b286b9d1d0d51"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264579"
-provenance = "github-attestations"
-
-[tools.nono."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:4321638e842f803d5cc5000c6e3b1a77ce40fe4f3646a54cc83b286b9d1d0d51"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264579"
-provenance = "github-attestations"
-
-[tools.nono."platforms.macos-arm64"]
-checksum = "sha256:ac161b551e14ee6f5dfb4e95593964e9af45db9c9d01074cbe7d6bf4110680b4"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264585"
-provenance = "github-attestations"
-
-[tools.nono."platforms.macos-x64"]
-checksum = "sha256:bae402c90e9d8f25e94e6c21b56e54a674ebfff3fa1bdc3c298e1bfc2f7e82dc"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264583"
-provenance = "github-attestations"
-
-[tools.nono."platforms.macos-x64-baseline"]
-checksum = "sha256:bae402c90e9d8f25e94e6c21b56e54a674ebfff3fa1bdc3c298e1bfc2f7e82dc"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.78.0/nono-v0.78.0-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/568264583"
-provenance = "github-attestations"
 
 [[tools."pipx:yubikey-manager"]]
 version = "5.9.2"
@@ -636,6 +582,18 @@ provenance = "github-attestations"
 version = "4.0.7"
 backend = "core:ruby"
 
+[tools.ruby."platforms.windows-x64"]
+checksum = "sha256:7a9be96d3448ecbd9a81eccae1f619131dfcc761f2c98dded03ece6c05d0474f"
+url = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-4.0.7-1/rubyinstaller-4.0.7-1-x64.7z"
+
+[tools.ruby."platforms.windows-x64-baseline"]
+checksum = "sha256:7a9be96d3448ecbd9a81eccae1f619131dfcc761f2c98dded03ece6c05d0474f"
+url = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-4.0.7-1/rubyinstaller-4.0.7-1-x64.7z"
+
+[[tools.ruby]]
+version = "4.0.7"
+backend = "core:ruby"
+
 [tools.ruby.options]
 compile = "false"
 precompiled_url = "jdx/ruby"
@@ -681,18 +639,6 @@ url = "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.7.tar.gz"
 [tools.ruby."platforms.macos-x64-baseline"]
 checksum = "sha256:911ace20f90d068ca0e4dda6d0e4f0f81e52e52f2dd4f4004c721e253412e82d"
 url = "https://cache.ruby-lang.org/pub/ruby/4.0/ruby-4.0.7.tar.gz"
-
-[[tools.ruby]]
-version = "4.0.7"
-backend = "core:ruby"
-
-[tools.ruby."platforms.windows-x64"]
-checksum = "sha256:7a9be96d3448ecbd9a81eccae1f619131dfcc761f2c98dded03ece6c05d0474f"
-url = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-4.0.7-1/rubyinstaller-4.0.7-1-x64.7z"
-
-[tools.ruby."platforms.windows-x64-baseline"]
-checksum = "sha256:7a9be96d3448ecbd9a81eccae1f619131dfcc761f2c98dded03ece6c05d0474f"
-url = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-4.0.7-1/rubyinstaller-4.0.7-1-x64.7z"
 
 [[tools.starship]]
 version = "1.26.0"

@@ -5,6 +5,11 @@
     "description": "Claude Code customization for TB, using SSO"
   },
   "extends": "claude-code-tb-base-no-keychain",
+  "network": {
+    "tls_intercept": {
+      "ca_validity": "30d"
+    }
+  },
   "credential_providers": {
     "claude_code": {
       "type": "oauth_capture",

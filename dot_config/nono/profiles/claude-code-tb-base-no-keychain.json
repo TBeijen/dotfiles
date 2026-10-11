@@ -34,7 +34,8 @@
       "$HOME/.claude",
       "$HOME/.cc-writes",
       "$HOME/.cache/claude",
-      "$HOME/.config/nono/profiles",
+      "$HOME/.local/state/claude/locks",
+      "$HOME/.config/nono/profile-drafts",
       "$HOME/projects",
       "/tmp/claude-$UID"
     ],
@@ -47,6 +48,7 @@
       "$HOME/.config/gh",
       "$HOME/dotfiles",
       "$HOME/.config/nono/packages",
+      "$HOME/.config/nono/profiles",
       "$HOME/.local/share/claude",
       "$HOME/.local/share/mise",
       "$HOME/.local/state/mise",
@@ -68,7 +70,6 @@
       ".next",
       "__pycache__",
       "target"
-
     ],
     "exclude_globs": [
       "*.tmp.[0-9]*.[0-9]*"
@@ -80,7 +81,12 @@
   "network": {
     "block": false,
     "network_profile": "developer",
-    "listen_port_range": [[49152, 65535]],
+    "listen_port_range": [
+      [
+        49152,
+        65535
+      ]
+    ],
     "open_port": [
       3030,
       5000,
@@ -88,7 +94,9 @@
       8931
     ],
     "allow_domain": [
+      "aws.amazon.com",
       "dag-andersen.github.io",
+      "docs.aws.amazon.com",
       "fnox.dev",
       "kubernetes.io",
       "marketplace.upbound.io",
@@ -118,10 +126,13 @@
       "productionresultssa17.blob.core.windows.net",
       "productionresultssa18.blob.core.windows.net",
       "productionresultssa19.blob.core.windows.net",
+      "repost.aws",
       "sli.dev"
     ],
     "tls_intercept": {
-      "ca_env_vars": ["GH_SSL_CERT_FILE"]
+      "ca_env_vars": [
+        "GH_SSL_CERT_FILE"
+      ]
     }
     // "credentials": ["github"],
     // "custom_credentials": {

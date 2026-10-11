@@ -4,15 +4,25 @@
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6"
   },
-  "model": "opus",
+  "model": "claude-sonnet-5",
   "hooks": {},
   "statusLine": {
     "type": "command",
-    "command": "bash {{ .chezmoi.homeDir }}/.claude/statusline-command.sh"
+    "command": "bash ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
-    "nono@always-further": true
+    "nono@always-further": true,
+    "humanize@humanize": true,
+    "mattpocock-skills@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "humanize": {
+      "source": {
+        "source": "github",
+        "repo": "harshaneel/humanize"
+      }
+    }
   },
   "effortLevel": "medium",
   "skipWorkflowUsageWarning": true,
