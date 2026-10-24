@@ -13,14 +13,18 @@
 #
 #   openssl storeutl -noout -text /opt/homebrew/etc/ca-certificates/cert.pem 2>/dev/null | grep -A2 "Zscaler"
 #
-# To trigger re-creation of the ca-certificates bundle:
+# To trigger re-creation of the ca-certificates bundle, either:
 #
 #   brew reinstall ca-certificates
+#   brew postinstall ca-certificates
+#
+# Grabbing the zscaler CA from OS trust store
+#
+#   security find-certificate -c "Zscaler Root CA" -p /Library/Keychains/System.keychain > ~/.zscaler/zscaler-ca.pem
 #
 # Concat pems into single bundle (if needed):
 #
-#   cat /usr/local/etc/ca-certificates/cert.pem > ~/.zscaler/bundle_combined.pem
-#   cat ~/.zcli/zscaler_root.pem >> ~/.zscaler/bundle_combined.pem
+#   cat /opt/homebrew/etc/ca-certificates/cert.pem ~/.zscaler/zscaler-ca.pem > ~/.zscaler/bundle_combined.pem
 #
 # Else, simply copy ca-certificates bundle to the combined bundle location:
 #
