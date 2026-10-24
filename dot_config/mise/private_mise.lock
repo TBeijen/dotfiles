@@ -303,6 +303,55 @@ backend = "gem:tmuxinator"
 version = "2.47.0"
 backend = "pipx:git-filter-repo"
 
+[[tools."github:TBeijen/secretd"]]
+version = "0.1.0"
+backend = "github:TBeijen/secretd"
+
+[tools."github:TBeijen/secretd"."platforms.linux-arm64"]
+checksum = "sha256:fbc1cc3afaf84a6f19f07b35dcd8fc83ff30e4efd848f0dcade8890cc97109a3"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493380"
+
+[tools."github:TBeijen/secretd"."platforms.linux-arm64-musl"]
+checksum = "sha256:fbc1cc3afaf84a6f19f07b35dcd8fc83ff30e4efd848f0dcade8890cc97109a3"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493380"
+
+[tools."github:TBeijen/secretd"."platforms.linux-x64"]
+checksum = "sha256:5450a824fc9391bed6baf90aaf8127a1c60b510e69e26e36d8b1b972fbb8d5da"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493377"
+
+[tools."github:TBeijen/secretd"."platforms.linux-x64-baseline"]
+checksum = "sha256:5450a824fc9391bed6baf90aaf8127a1c60b510e69e26e36d8b1b972fbb8d5da"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493377"
+
+[tools."github:TBeijen/secretd"."platforms.linux-x64-musl"]
+checksum = "sha256:5450a824fc9391bed6baf90aaf8127a1c60b510e69e26e36d8b1b972fbb8d5da"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493377"
+
+[tools."github:TBeijen/secretd"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:5450a824fc9391bed6baf90aaf8127a1c60b510e69e26e36d8b1b972fbb8d5da"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493377"
+
+[tools."github:TBeijen/secretd"."platforms.macos-arm64"]
+checksum = "sha256:0d224973f6a946c14e2ffa9adfae5a230a6e2c490ae8041372ec4d6bc6992196"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493379"
+
+[tools."github:TBeijen/secretd"."platforms.macos-x64"]
+checksum = "sha256:53f0d14f646c71264d4c425985fd6e7ddbd2d5ab68c7ec7ae80517bd9476dc09"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-darwin-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493378"
+
+[tools."github:TBeijen/secretd"."platforms.macos-x64-baseline"]
+checksum = "sha256:53f0d14f646c71264d4c425985fd6e7ddbd2d5ab68c7ec7ae80517bd9476dc09"
+url = "https://github.com/TBeijen/secretd/releases/download/v0.1.0/secretd-darwin-amd64.tar.gz"
+url_api = "https://api.github.com/repos/TBeijen/secretd/releases/assets/672493378"
+
 [[tools."github:TBeijen/sworkspace"]]
 version = "0.1.0"
 backend = "github:TBeijen/sworkspace"
@@ -512,7 +561,7 @@ checksum = "sha256:50efaf01a08c520b4bbe499c09a8c5a5c370002c419c0d9da2c6815d3066a
 url = "https://nodejs.org/dist/v26.12.0/node-v26.12.0-win-x64.zip"
 
 [[tools.nono]]
-version = "pr-2088"
+version = "sso-0.80"
 backend = "github:nolabs-ai/nono"
 
 [[tools."pipx:yubikey-manager"]]

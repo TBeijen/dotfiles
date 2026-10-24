@@ -102,6 +102,7 @@
       "kubernetes.io",
       "marketplace.upbound.io",
       "mise.jdx.dev",
+      "mise-versions.jdx.dev",
       // Used for local slidev mcp. Be aware of other services or port-forwards.
       "localhost",
       "nono.sh",

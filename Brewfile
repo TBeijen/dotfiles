@@ -11,6 +11,9 @@
 brew "mas"
 brew "mise"
 
+# (Optional) All casks go to ~/Applications (put this at the top)
+# cask_args appdir: "~/Applications"
+
 # Applications
 cask "adobe-digital-editions"
 cask "beekeeper-studio"
@@ -30,7 +33,7 @@ cask "rancher"
 cask "signal"
 cask "sourcetree"
 cask "spotify"
-cask "sublime-text"
+cask "sublime-text", args: { appdir: "~/Applications" }
 cask "visual-studio-code"
 cask "whatsapp"
 cask "windows-app"
