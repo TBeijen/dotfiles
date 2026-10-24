@@ -29,6 +29,10 @@
     "signal_mode": "isolated",
     "capability_elevation": false
   },
+  "environment": {
+    "deny_vars": ["GH_TOKEN"],
+     "set_vars": { "GH_TOKEN": "nono-phantom" }
+  },
   "filesystem": {
     "allow": [
       "$HOME/.claude",
@@ -75,9 +79,6 @@
       "*.tmp.[0-9]*.[0-9]*"
     ]
   },
-  // "env_credentials": {
-  //   "apple-password://github.com/github-pat-dpg-readonly": "GH_TOKEN"
-  // },
   "network": {
     "block": false,
     "network_profile": "developer",
@@ -133,19 +134,19 @@
       "ca_env_vars": [
         "GH_SSL_CERT_FILE"
       ]
+    },
+    "credentials": ["github"],
+    "custom_credentials": {
+      "github": {
+        "upstream": "https://api.github.com",
+        "credential_key": "env://GH_TOKEN",
+        "inject_header": "Authorization",
+        "credential_format": "token {}",
+        "endpoint_rules": [
+          { "method": "GET", "path": "/**" },
+          { "method": "POST", "path": "/graphql" }
+        ]
+      }
     }
-    // "credentials": ["github"],
-    // "custom_credentials": {
-    //   "github": {
-    //     "upstream": "https://api.github.com",
-    //     "credential_key": "apple-password://github.com/github-pat-dpg-readonly",
-    //     "env_var": "GH_TOKEN",
-    //     "inject_header": "Authorization",
-    //     "credential_format": "token {}",
-    //     "endpoint_rules": [
-    //       { "method": "GET", "path": "/**" }
-    //     ]
-    //   }
-    // }
   }
 }
