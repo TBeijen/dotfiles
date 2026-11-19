@@ -301,7 +301,7 @@ backend = "gem:tmuxinator"
 
 [[tools.git-filter-repo]]
 version = "2.47.0"
-backend = "pipx:git-filter-repo"
+backend = "pypi:git-filter-repo"
 
 [[tools."github:TBeijen/secretd"]]
 version = "0.1.0"

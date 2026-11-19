@@ -30,8 +30,12 @@
     "capability_elevation": false
   },
   "environment": {
-    "deny_vars": ["GH_TOKEN"],
-     "set_vars": { "GH_TOKEN": "nono-phantom" }
+    "deny_vars": [
+      "GH_TOKEN"
+    ],
+    "set_vars": {
+      "GH_TOKEN": "nono-phantom"
+    }
   },
   "filesystem": {
     "allow": [
@@ -49,6 +53,7 @@
       "$HOME/.claude.lock"
     ],
     "read": [
+      "$HOME/.agents/skills",
       "$HOME/.config/gh",
       "$HOME/dotfiles",
       "$HOME/.config/nono/packages",
@@ -62,7 +67,15 @@
       "$HOME/.zscaler/bundle_combined.pem",
       "$HOME/.gitconfig-dpg",
       "$HOME/.ssh/dpg_id_ed25519_sign",
-      "$HOME/.ssh/id_ed25519_sign"
+      "$HOME/.ssh/dpg_id_ed25519_sign.pub",
+      "$HOME/.ssh/id_ed25519_sign",
+      "$HOME/.ssh/id_ed25519_sign.pub"
+    ],
+    "bypass_protection": [
+      "$HOME/.ssh/id_ed25519_sign",
+      "$HOME/.ssh/id_ed25519_sign.pub",
+      "$HOME/.ssh/dpg_id_ed25519_sign",
+      "$HOME/.ssh/dpg_id_ed25519_sign.pub"
     ]
   },
   "workdir": {
@@ -136,16 +149,45 @@
         "GH_SSL_CERT_FILE"
       ]
     },
-    "credentials": ["github"],
+    "credentials": [
+      "github",
+      "github_git"
+    ],
     "custom_credentials": {
       "github": {
         "upstream": "https://api.github.com",
         "credential_key": "env://GH_TOKEN",
-        "inject_header": "Authorization",
         "credential_format": "token {}",
+        "inject_header": "Authorization",
         "endpoint_rules": [
-          { "method": "GET", "path": "/**" },
-          { "method": "POST", "path": "/graphql" }
+          {
+            "method": "GET",
+            "path": "/**"
+          },
+          {
+            "method": "POST",
+            "path": "/graphql"
+          }
+        ]
+      },
+      "github_git": {
+        "upstream": "https://github.com",
+        "credential_key": "env://GH_GIT_BASIC",
+        "credential_format": "Basic {}",
+        "inject_header": "Authorization",
+        "endpoint_rules": [
+          {
+            "method": "GET",
+            "path": "/*/*/info/refs"
+          },
+          {
+            "method": "POST",
+            "path": "/*/*/git-upload-pack"
+          },
+          {
+            "method": "POST",
+            "path": "/*/*/git-receive-pack"
+          }
         ]
       }
     }
