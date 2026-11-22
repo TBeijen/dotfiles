@@ -1,0 +1,24 @@
+{
+  "$schema": "./nono-profile.schema.json",
+  "extends": "tb-base-no-keychain",
+  "meta": {
+    "name": "copilot-tb",
+    "version": "0.1.0",
+    "description": "GitHub Copilot CLI (macOS) on top of tb-base-no-keychain. Paths adapted from nolabs-ai/copilot-base; no Keychain, no unsafe seatbelt rules."
+  },
+  "filesystem": {
+    "allow": [
+      "/usr/local/Caskroom/copilot-cli",
+      "$HOME/.copilot",
+      "$HOME/Library/Caches/copilot",
+      "$HOME/.cache/copilot"
+    ]
+  },
+  "open_urls": {
+    "allow_origins": [
+      "https://github.com"
+    ],
+    "allow_localhost": true
+  },
+  "allow_launch_services": true
+}

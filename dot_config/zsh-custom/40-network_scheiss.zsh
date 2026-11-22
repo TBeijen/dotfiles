@@ -32,6 +32,12 @@
 #
 ZSCALER_COMBINED_BUNDLE=~/.zscaler/bundle_combined.pem
 
+# Java ignores the PEM bundle: it needs a keystore. Built from the combined bundle (which holds
+# the full root set plus Zscaler), so one file serves every JDK. Rebuild after the bundle changes:
+#   zscaler_java_truststore_build
+ZSCALER_JAVA_TRUSTSTORE=~/.zscaler/java-truststore.p12
+ZSCALER_JAVA_TRUSTSTORE_PASS=changeit   # Java convention, not a secret
+
 # Source this file,then call below function in bashrc/zshrc and the likes
 zscaler_bundle_on() {
   export AWS_CA_BUNDLE=$ZSCALER_COMBINED_BUNDLE
@@ -41,6 +47,12 @@ zscaler_bundle_on() {
   export PIP_CERT=$ZSCALER_COMBINED_BUNDLE
   export REQUESTS_CA_BUNDLE=$ZSCALER_COMBINED_BUNDLE
   export SSL_CERT_FILE=$ZSCALER_COMBINED_BUNDLE
+
+  if [[ -f $ZSCALER_JAVA_TRUSTSTORE ]]; then
+    export JAVA_TOOL_OPTIONS="-Djavax.net.ssl.trustStore=$ZSCALER_JAVA_TRUSTSTORE -Djavax.net.ssl.trustStorePassword=$ZSCALER_JAVA_TRUSTSTORE_PASS -Djavax.net.ssl.trustStoreType=PKCS12"
+  fi
+  # cheap staleness hint, no build at shell startup
+  [[ $ZSCALER_COMBINED_BUNDLE -nt $ZSCALER_JAVA_TRUSTSTORE ]] && echo "zscaler: java truststore is missing or older than the bundle (zscaler_java_truststore_build)" >&2
 }
 
 zscaler_bundle_off() {
@@ -51,4 +63,36 @@ zscaler_bundle_off() {
   unset PIP_CERT
   unset REQUESTS_CA_BUNDLE
   unset SSL_CERT_FILE
+
+  unset JAVA_TOOL_OPTIONS
+}
+
+zscaler_java_truststore_build() {
+  local src=$ZSCALER_COMBINED_BUNDLE out=$ZSCALER_JAVA_TRUSTSTORE tmp
+  tmp=$(mktemp -d) || return 1
+  cat > "$tmp/BuildTruststore.java" <<'EOF'
+import java.io.*;
+import java.security.KeyStore;
+import java.security.cert.*;
+
+public class BuildTruststore {
+  public static void main(String[] a) throws Exception {
+    KeyStore ks = KeyStore.getInstance("PKCS12");
+    ks.load(null, null);
+    int i = 0;
+    try (InputStream in = new BufferedInputStream(new FileInputStream(a[0]))) {
+      for (Certificate c : CertificateFactory.getInstance("X.509").generateCertificates(in)) {
+        ks.setCertificateEntry("ca-" + i++, c);
+      }
+    }
+    try (OutputStream out = new FileOutputStream(a[1])) { ks.store(out, a[2].toCharArray()); }
+    System.out.println("truststore: " + i + " certificates -> " + a[1]);
+  }
+}
+EOF
+  # `mise x java@...` or any java on PATH; java BuildTruststore.java runs the source file directly (JDK 11+)
+  java "$tmp/BuildTruststore.java" "$src" "$out" "$ZSCALER_JAVA_TRUSTSTORE_PASS"
+  local rc=$?
+  rm -rf "$tmp"
+  return $rc
 }

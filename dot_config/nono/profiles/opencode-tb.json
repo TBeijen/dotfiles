@@ -1,0 +1,45 @@
+{
+  "$schema": "./nono-profile.schema.json",
+  "extends": "tb-base-no-keychain",
+  "meta": {
+    "name": "opencode-tb",
+    "version": "0.1.0",
+    "description": "OpenCode v2.1.0+ on top of tb-base-no-keychain. Paths adapted from nolabs-ai/opencode; deliberately omits its Keychain read and ~/.claude, ~/.codex grants."
+  },
+  "groups": {
+    "include": [
+      { "name": "opencode_linux", "when": "linux" }
+    ]
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.config/opencode",
+      "$HOME/.cache/opencode",
+      "$HOME/.local/share/opencode",
+      "$HOME/.local/share/opentui",
+      "$HOME/.local/state/opencode"
+    ],
+    "read": [
+      // bin/ is on PATH. Upgrade opencode outside the sandbox.
+      "$HOME/.opencode"
+    ]
+  },
+  "environment": {
+    "set_vars": {
+      "TMPDIR": "$HOME/.cache/opencode/tmp",
+      "BUN_TMPDIR": "$HOME/.cache/opencode/tmp"
+    }
+  },
+  "open_urls": {
+    "allow_origins": [
+      "https://github.com"
+    ],
+    "allow_localhost": true
+  },
+  "allow_launch_services": true,
+  "rollback": {
+    "exclude_patterns": [
+      ".opencode"
+    ]
+  }
+}
