@@ -2,15 +2,11 @@
   "$schema": "./nono-profile.schema.json",
   "extends": "opencode-tb",
   "meta": {
-    "name": "opencode-tb-sso",
-    "version": "0.1.0",
-    "description": "EXPERIMENTAL: opencode-tb plus OpenAI OAuth capture, so the sandbox only sees phantom tokens. Endpoints adapted from nono's Codex device-auth example; unverified for opencode."
+    "name": "opencode-tb-device-code",
+    "version": "0.2.0",
+    "description": "opencode-tb plus OpenAI OAuth capture, so the sandbox only sees phantom tokens. Only works with opencode's 'Codex device code (legacy)' login: the browser token-sharing login verifies the ID token signature, which a phantom cannot pass. Needs device code authorization enabled in OpenAI security settings."
   },
   "network": {
-    "open_port": [
-      // Loopback callback for browser-based OpenAI login (Codex uses 1455). Unverified for opencode.
-      1455
-    ],
     "tls_intercept": {
       "ca_validity": "30d"
     }
@@ -32,7 +28,19 @@
           "request_nonce_fields": ["refresh_token"]
         },
         {
-          // Browser login code exchange and refresh
+          // Browser login code exchange (path seen in the nono log)
+          "host": "https://auth.openai.com",
+          "path": "/api/accounts/oauth/token",
+          "response_fields": [
+            { "path": "access_token", "kind": "opaque" },
+            { "path": "refresh_token", "kind": "opaque" },
+            { "path": "id_token", "kind": "jwt" }
+          ],
+          "request_body": "auto",
+          "request_nonce_fields": ["refresh_token"]
+        },
+        {
+          // Possible refresh path (as in the Codex example)
           "host": "https://auth.openai.com",
           "path": "/oauth/token",
           "response_fields": [

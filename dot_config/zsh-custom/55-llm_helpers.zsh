@@ -34,7 +34,7 @@ sopencode() {
   local url="http://127.0.0.1:$port"
   local logdir="${XDG_STATE_HOME:-$HOME/.local/state}/sopencode"
   local log="$logdir/server.log"
-  local base=(fnox exec -- nono run --profile opencode-tb --allow-cwd --)
+  local base=(fnox exec -- nono run --profile opencode-tb-sso --allow-cwd --)
 
   # Start the shared sandboxed server if nothing listens on the port yet.
   # The server picks a random password on each start and prints it to its log.
