@@ -30,6 +30,13 @@
       "BUN_TMPDIR": "$HOME/.cache/opencode/tmp"
     }
   },
+  "network": {
+    // Shared sandboxed opencode server (see sopencode): server binds it, TUIs connect to it.
+    // Only here and not in the shared base, so other agents can't reach it.
+    "open_port": [
+      4096
+    ]
+  },
   "open_urls": {
     "allow_origins": [
       "https://github.com"
