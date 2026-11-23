@@ -35,10 +35,17 @@
     // Only here and not in the shared base, so other agents can't reach it.
     "open_port": [
       4096
+    ],
+    "allow_domain": [
+      "auth.openai.com",
+      "api.openai.com",
+      // ChatGPT-subscription login uses its backend API; drop if only API keys are used.
+      "chatgpt.com"
     ]
   },
   "open_urls": {
     "allow_origins": [
+      "https://auth.openai.com",
       "https://github.com"
     ],
     "allow_localhost": true
