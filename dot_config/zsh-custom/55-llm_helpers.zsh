@@ -1,5 +1,6 @@
 sclaude() {
-  local cmd=(fnox exec -- nono run --profile claude-code-tb-sso --allow-cwd -- claude "$@")
+  local profile="${NONO_PROFILE:-claude-code-tb-sso}"
+  local cmd=(fnox exec -- nono run --profile "$profile" --allow-cwd -- claude "$@")
   # Exporting the startup command as env var. In case we need to experiment or troubleshoot by adding flags,
   # we can get it via `! echo $SCLAUDE_CMD`
   #
@@ -9,38 +10,20 @@ sclaude() {
   "${cmd[@]}"
 }
 
-# sopencode() {
-#   local cmd=(fnox exec -- nono run --profile opencode-tb --allow-cwd -- opencode --standalone "$@")
-#   # Exporting the startup command as env var. In case we need to experiment or troubleshoot by adding flags,
-#   # we can get it via `! echo $SOPENCODE_CMD`
-#   #
-#   # Also outputing to stderr, which might be visible on launch or after TUI exits.
-#   echo "→ ${cmd[*]}" >&2
-#   export SOPENCODE_CMD="${cmd[*]}"
-#   "${cmd[@]}"
-# }
-
-_sopencode_password() {
-  local f="${XDG_STATE_HOME:-$HOME/.local/state}/sopencode/password"
-  if [[ ! -s $f ]]; then
-    mkdir -p "${f:h}"
-    (umask 077; openssl rand -hex 24 > "$f")
-  fi
-  cat "$f"
-}
-
 sopencode() {
+  local profile="${NONO_PROFILE:-opencode-tb}"
   local port=4096   # must match network.open_port in opencode-tb.json
   local url="http://127.0.0.1:$port"
   local logdir="${XDG_STATE_HOME:-$HOME/.local/state}/sopencode"
   local log="$logdir/server.log"
-  local base=(fnox exec -- nono run --profile opencode-tb-sso --allow-cwd --)
+  local profile_file="$logdir/server.profile"
+  local base=(fnox exec -- nono run --profile "$profile" --allow-cwd --)
 
-  # Start the shared sandboxed server if nothing listens on the port yet.
-  # The server picks a random password on each start and prints it to its log.
   if ! nc -z 127.0.0.1 $port 2>/dev/null; then
+    # Start the shared sandboxed server. It picks a random password on each start and prints it to its log.
     mkdir -p "$logdir" && chmod 700 "$logdir"
     (umask 077; : > "$log")   # fresh, owner-only log per server start
+    print -r -- "$profile" > "$profile_file"
     local server=("${base[@]}" opencode serve --port $port)
     echo "→ (server) ${server[*]}  [log: $log]" >&2
     nohup "${server[@]}" >>"$log" 2>&1 </dev/null &!
@@ -49,6 +32,13 @@ sopencode() {
       grep -q 'server password' "$log" 2>/dev/null && break
       sleep 0.3
     done
+  else
+    # The server's profile is fixed when it starts; don't attach a TUI under a different profile.
+    local running="$(cat "$profile_file" 2>/dev/null)"
+    if [[ -n $running && $running != "$profile" ]]; then
+      echo "opencode server is running with profile '$running', not '$profile'. Run sopencode-stop first." >&2
+      return 1
+    fi
   fi
 
   local pw="$(sed -n 's/.*server password \([^[:space:]]*\).*/\1/p' "$log" 2>/dev/null | tail -n1)"
@@ -66,6 +56,7 @@ sopencode() {
 }
 
 sopencode-stop() {
-  # Stops the shared sandboxed server; every attached TUI loses its connection.
+  # Stops the shared sandboxed server; ts connection.
   lsof -tiTCP:4096 -sTCP:LISTEN | xargs -r kill
+  rm -f "${XDG_STATE_HOME:-$HOME/.localrofile"
 }
